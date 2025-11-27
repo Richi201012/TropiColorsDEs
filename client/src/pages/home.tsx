@@ -86,36 +86,6 @@ const testimonials = [
   },
 ];
 
-const recipes = [
-  {
-    id: 1,
-    title: "Cupcakes con Frosting Turquesa",
-    description: "Aprende a crear cupcakes con frosting en un hermoso color turquesa usando colorantes Tropicolors. Perfecto para cumpleaños.",
-    color: "turquoise",
-    icon: "🧁",
-  },
-  {
-    id: 2,
-    title: "Bebida Tropical Azul",
-    description: "Crea una bebida refrescante con un vibrante color azul. Ideal para fiestas de verano con nuestros colorantes líquidos.",
-    color: "blue",
-    icon: "🥤",
-  },
-  {
-    id: 3,
-    title: "Glaseado Rosa Brillante",
-    description: "Un glaseado perfecto para decorar galletas y pasteles. Aprende la técnica correcta para obtener ese rosa brillante.",
-    color: "pink",
-    icon: "🍪",
-  },
-  {
-    id: 4,
-    title: "Macarrones Arcoíris",
-    description: "Los macarrones franceses en múltiples colores son mucho más fáciles con nuestros colorantes en polvo de alta concentración.",
-    color: "rainbow",
-    icon: "🌈",
-  },
-];
 
 type CartItem = { id: number; name: string; price: number; quantity: number };
 
@@ -134,7 +104,6 @@ function Header({ scrollToSection, cartCount, onCartClick }: { scrollToSection: 
     { label: "Productos", id: "productos" },
     { label: "Nosotros", id: "nosotros" },
     { label: "Beneficios", id: "beneficios" },
-    { label: "Recetas", id: "recetas" },
     { label: "Contacto", id: "contacto" },
   ];
 
@@ -596,47 +565,6 @@ function TestimonialsSection() {
   );
 }
 
-function RecipesSection({ scrollToSection }: { scrollToSection: (id: string) => void }) {
-  return (
-    <section id="recetas" className="py-20 sm:py-28" data-testid="section-recipes">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm">Blog</Badge>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
-            Recetas y <span className="text-primary">Aplicaciones</span>
-          </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Descubre ideas creativas para usar nuestros colorantes en tus preparaciones favoritas
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-          {recipes.map((recipe) => (
-            <Card key={recipe.id} className="hover-elevate overflow-hidden" data-testid={`card-recipe-${recipe.id}`}>
-              <div className={`h-40 bg-gradient-to-br from-${recipe.color}-400 to-${recipe.color}-600 flex items-center justify-center text-6xl`}>
-                {recipe.icon}
-              </div>
-              <CardContent className="p-6 space-y-4">
-                <div>
-                  <h3 className="text-2xl font-semibold mb-2">{recipe.title}</h3>
-                  <p className="text-muted-foreground">{recipe.description}</p>
-                </div>
-                <Button
-                  onClick={() => scrollToSection("productos")}
-                  variant="outline"
-                  className="w-full"
-                  data-testid={`button-recipe-products-${recipe.id}`}
-                >
-                  Ver Colorantes
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
 function WhatsAppCTA() {
   return (
@@ -991,7 +919,6 @@ export default function Home() {
         <AboutSection />
         <BenefitsSection />
         <TestimonialsSection />
-        <RecipesSection scrollToSection={scrollToSection} />
         <WhatsAppCTA />
         <ContactSection />
       </main>
