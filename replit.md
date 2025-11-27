@@ -2,7 +2,20 @@
 
 ## Overview
 
-Tropicolors is a single-page React application for a company specializing in artificial food colorants and cleaning product dyes. The application serves as a marketing and sales platform featuring product showcases, company information, benefits, and direct WhatsApp integration for quotations. Built with modern web technologies, it delivers a clean, highly visual, and responsive experience inspired by contemporary design patterns with large blocks, ample spacing, and bold brand colors.
+Tropicolors is a single-page React application for a company specializing in artificial food colorant powders and concentrates for the food industry and cleaning products. The application serves as a marketing and sales platform featuring a complete product catalog of 37 items organized by color categories, integrated shopping cart with WhatsApp checkout, company information, testimonials, and direct WhatsApp integration for quotations. Built with modern web technologies and Framer Motion animations, it delivers a visually-stunning, highly responsive experience with MGX-inspired design patterns including animated hero sections, scroll-triggered animations, and bold brand colors.
+
+## Recent Changes (November 2025)
+
+- Added animated hero section with floating color blobs and particle effects
+- Implemented scroll-triggered fade-in animations across all sections using Framer Motion
+- Enhanced product cards with hover effects and staggered entry animations
+- Added gradient backgrounds and decorative overlays between sections
+- Improved testimonials section with animated stars and quotes
+- Created dedicated WhatsApp CTA section with prominent green styling
+- Enhanced footer with company info, contact details, and animated social links
+- Added toast notifications when products are added to cart
+- Fixed ParticleField particles memoized as PARTICLES constant to prevent re-render issues
+- Updated stats to show "37+ Productos" to match actual catalog size
 
 ## User Preferences
 
