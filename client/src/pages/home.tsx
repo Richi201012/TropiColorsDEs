@@ -209,7 +209,7 @@ const benefits = [
 const testimonials = [
   {
     id: 1,
-    name: "María López",
+    name: "Daniela Cruz",
     business: "Repostería Dulce Sueño",
     rating: 5,
     text: "Los colorantes de Tropicolors son excelentes. Mis pasteles se ven mucho más vibrantes y los clientes están encantados con los resultados.",
