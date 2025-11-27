@@ -116,3 +116,23 @@ Preferred communication style: Simple, everyday language.
 - Google Fonts API for Poppins font family
 - Date-fns for date manipulation utilities
 - Session management support via express-session and connect-pg-simple (configured but not actively used)
+
+## Vercel Deployment
+
+### Configuration Files
+- `vercel.json` - Build and routing configuration
+- `api/contact.ts` - Serverless function for contact form API
+- `script/build-vercel.ts` - Custom build script for Vercel
+
+### Deployment Steps
+1. Push code to GitHub repository
+2. Import project in Vercel dashboard (vercel.com)
+3. Set environment variable: `DATABASE_URL` (copy from Replit Secrets)
+4. Deploy
+
+### Environment Variables Required
+- `DATABASE_URL` - PostgreSQL connection string (Neon serverless compatible)
+
+### API Endpoints (Serverless)
+- `POST /api/contact` - Submit contact form message
+- `GET /api/contact` - Retrieve contact messages (admin use)
