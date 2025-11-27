@@ -371,13 +371,13 @@ function ProductsSection() {
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-2 pt-2">
-                  <Button variant="secondary" className="flex-1" data-testid={`button-comprar-${product.id}`}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+                  <Button variant="secondary" className="w-full" data-testid={`button-comprar-${product.id}`}>
                     Comprar
                   </Button>
                   <Button
                     onClick={() => window.open(WHATSAPP_LINK, "_blank")}
-                    className="flex-1 bg-[#25D366] hover:bg-[#20BD5A] text-white border-[#20BD5A] gap-1.5"
+                    className="w-full bg-[#25D366] hover:bg-[#20BD5A] text-white border-[#20BD5A] gap-1.5"
                     data-testid={`button-cotizar-${product.id}`}
                   >
                     <SiWhatsapp className="w-4 h-4" />
