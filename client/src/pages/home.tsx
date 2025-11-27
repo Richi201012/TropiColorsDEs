@@ -315,29 +315,34 @@ function Hero({ scrollToSection }: { scrollToSection: (id: string) => void }) {
   );
 }
 
+const categoryColors: Record<string, string> = {
+  "Rojos y Rosas": "bg-gradient-to-r from-pink-500 to-rose-500",
+  "Amarillos y Naranjas": "bg-gradient-to-r from-yellow-400 to-orange-500",
+  "Azules y Verdes": "bg-gradient-to-r from-blue-500 to-emerald-500",
+  "Negros, Marrones y Violetas": "bg-gradient-to-r from-gray-600 to-violet-600",
+};
+
 function ProductsSection({ cart, setCart }: { cart: CartItem[]; setCart: (cart: CartItem[]) => void }) {
   const [quantities, setQuantities] = useState<Record<number, number>>({});
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredSections, setFilteredSections] = useState(productSections);
+  const [activeCategory, setActiveCategory] = useState(productSections[0].name);
+  const [filteredProducts, setFilteredProducts] = useState(productSections[0].products);
 
   useEffect(() => {
+    const currentSection = productSections.find(s => s.name === activeCategory);
+    if (!currentSection) return;
+
     if (!searchTerm.trim()) {
-      setFilteredSections(productSections);
+      setFilteredProducts(currentSection.products);
       return;
     }
     
     const lowerSearch = searchTerm.toLowerCase();
-    const filtered = productSections
-      .map(section => ({
-        ...section,
-        products: section.products.filter(p =>
-          p.name.toLowerCase().includes(lowerSearch)
-        ),
-      }))
-      .filter(section => section.products.length > 0);
-    
-    setFilteredSections(filtered);
-  }, [searchTerm]);
+    const filtered = currentSection.products.filter(p =>
+      p.name.toLowerCase().includes(lowerSearch)
+    );
+    setFilteredProducts(filtered);
+  }, [searchTerm, activeCategory]);
 
   const handleAddToCart = (product: (typeof allProducts)[0]) => {
     const quantity = quantities[product.id] || 1;
@@ -369,13 +374,34 @@ function ProductsSection({ cart, setCart }: { cart: CartItem[]; setCart: (cart: 
             Nuestros <span className="text-primary">Productos</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-            Descubre nuestra línea completa de colorantes artificiales para todas tus necesidades
+            Selecciona una categoría para ver nuestros colorantes
           </p>
+
+          <div className="flex flex-wrap justify-center gap-3 mb-8">
+            {productSections.map((section) => (
+              <button
+                key={section.name}
+                onClick={() => {
+                  setActiveCategory(section.name);
+                  setSearchTerm("");
+                }}
+                className={`px-5 py-3 rounded-full font-medium text-sm transition-all duration-300 ${
+                  activeCategory === section.name
+                    ? `${categoryColors[section.name]} text-white shadow-lg scale-105`
+                    : "bg-card border border-border text-foreground hover:border-primary/50"
+                }`}
+                data-testid={`button-category-${section.name}`}
+              >
+                {section.name}
+                <span className="ml-2 text-xs opacity-80">({section.products.length})</span>
+              </button>
+            ))}
+          </div>
 
           <div className="relative max-w-md mx-auto">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
-              placeholder="Buscar colorantes..."
+              placeholder="Buscar en esta categoría..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-12 h-11"
@@ -384,83 +410,79 @@ function ProductsSection({ cart, setCart }: { cart: CartItem[]; setCart: (cart: 
           </div>
         </div>
 
-        {filteredSections.length === 0 ? (
+        <div className="mb-6">
+          <h3 className={`text-2xl font-bold text-transparent bg-clip-text ${categoryColors[activeCategory]} inline-block`}>
+            {activeCategory}
+          </h3>
+        </div>
+
+        {filteredProducts.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground text-lg">No se encontraron productos que coincidan con tu búsqueda.</p>
           </div>
         ) : (
-          <div className="space-y-16">
-            {filteredSections.map((section) => (
-              <div key={section.name} className="space-y-8">
-                <div className="border-b-2 border-primary/20 pb-4">
-                  <h3 className="text-2xl sm:text-3xl font-bold text-foreground">{section.name}</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            {filteredProducts.map((product) => (
+              <Card key={product.id} className="group overflow-visible hover-elevate transition-all duration-300 flex flex-col" data-testid={`card-product-${product.id}`}>
+                <div className={`h-48 bg-gradient-to-br ${product.gradient} relative overflow-hidden rounded-t-xl`}>
+                  <div className="absolute inset-0 bg-black/10" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center text-white">
+                      <Droplet className="w-16 h-16 mx-auto mb-2 opacity-90" />
+                      <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
+                        Colorante
+                      </Badge>
+                    </div>
+                  </div>
                 </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-                  {section.products.map((product) => (
-                    <Card key={product.id} className="group overflow-visible hover-elevate transition-all duration-300 flex flex-col" data-testid={`card-product-${product.id}`}>
-                      <div className={`h-48 bg-gradient-to-br ${product.gradient} relative overflow-hidden rounded-t-xl`}>
-                        <div className="absolute inset-0 bg-black/10" />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="text-center text-white">
-                            <Droplet className="w-16 h-16 mx-auto mb-2 opacity-90" />
-                            <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
-                              Colorante
-                            </Badge>
-                          </div>
-                        </div>
+                <CardContent className="p-6 space-y-4 flex-1 flex flex-col">
+                  <div>
+                    <h4 className="text-lg font-semibold mb-2" data-testid={`text-product-name-${product.id}`}>{product.name}</h4>
+                    <p className="text-2xl font-bold text-primary">${product.price.toLocaleString('es-MX')}</p>
+                  </div>
+
+                  <div className="flex-1" />
+
+                  <div className="space-y-3 pt-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-muted-foreground">Cantidad:</span>
+                      <div className="flex items-center border border-border rounded-md">
+                        <button
+                          onClick={() => updateQuantity(product.id, (quantities[product.id] || 1) - 1)}
+                          className="p-1 hover:bg-muted"
+                          data-testid={`button-decrease-${product.id}`}
+                        >
+                          <Minus className="w-4 h-4" />
+                        </button>
+                        <input
+                          type="number"
+                          min="1"
+                          value={quantities[product.id] || 1}
+                          onChange={(e) => updateQuantity(product.id, parseInt(e.target.value) || 1)}
+                          className="w-12 text-center border-0 focus:ring-0 text-sm"
+                          data-testid={`input-quantity-${product.id}`}
+                        />
+                        <button
+                          onClick={() => updateQuantity(product.id, (quantities[product.id] || 1) + 1)}
+                          className="p-1 hover:bg-muted"
+                          data-testid={`button-increase-${product.id}`}
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
                       </div>
-                      <CardContent className="p-6 space-y-4 flex-1 flex flex-col">
-                        <div>
-                          <h4 className="text-lg font-semibold mb-2" data-testid={`text-product-name-${product.id}`}>{product.name}</h4>
-                          <p className="text-2xl font-bold text-primary">${product.price.toLocaleString('es-MX')}</p>
-                        </div>
+                    </div>
 
-                        <div className="flex-1" />
-
-                        <div className="space-y-3 pt-2">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-muted-foreground">Cantidad:</span>
-                            <div className="flex items-center border border-border rounded-md">
-                              <button
-                                onClick={() => updateQuantity(product.id, (quantities[product.id] || 1) - 1)}
-                                className="p-1 hover:bg-muted"
-                                data-testid={`button-decrease-${product.id}`}
-                              >
-                                <Minus className="w-4 h-4" />
-                              </button>
-                              <input
-                                type="number"
-                                min="1"
-                                value={quantities[product.id] || 1}
-                                onChange={(e) => updateQuantity(product.id, parseInt(e.target.value) || 1)}
-                                className="w-12 text-center border-0 focus:ring-0 text-sm"
-                                data-testid={`input-quantity-${product.id}`}
-                              />
-                              <button
-                                onClick={() => updateQuantity(product.id, (quantities[product.id] || 1) + 1)}
-                                className="p-1 hover:bg-muted"
-                                data-testid={`button-increase-${product.id}`}
-                              >
-                                <Plus className="w-4 h-4" />
-                              </button>
-                            </div>
-                          </div>
-
-                          <Button
-                            onClick={() => handleAddToCart(product)}
-                            className="w-full bg-[#25D366] hover:bg-[#20BD5A] text-white border-[#20BD5A] gap-1.5"
-                            data-testid={`button-add-to-cart-${product.id}`}
-                          >
-                            <ShoppingCart className="w-4 h-4" />
-                            Agregar al Carrito
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </div>
+                    <Button
+                      onClick={() => handleAddToCart(product)}
+                      className="w-full bg-[#25D366] hover:bg-[#20BD5A] text-white border-[#20BD5A] gap-1.5"
+                      data-testid={`button-add-to-cart-${product.id}`}
+                    >
+                      <ShoppingCart className="w-4 h-4" />
+                      Agregar al Carrito
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         )}
