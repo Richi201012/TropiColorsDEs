@@ -31,23 +31,73 @@ import logoImage from "@assets/logo-2021100510533067100_1764265250371.jpeg";
 
 const WHATSAPP_LINK = "https://wa.me/525551146856";
 
-const products = [
-  { id: 1, name: "Colorante Artificial Azul 125", price: 410, gradient: "from-blue-500 to-cyan-500" },
-  { id: 2, name: "Colorante Artificial Naranja 850", price: 3600, gradient: "from-orange-500 to-amber-500" },
-  { id: 3, name: "Exhibidor Sobres Rosa Brillante 125", price: 594, gradient: "from-pink-500 to-rose-500" },
-  { id: 4, name: "Colorante Artificial Tropicolors Verde Limón 125 6kg", price: 1050, gradient: "from-green-500 to-emerald-500" },
-  { id: 5, name: "Colorante Artificial Negro 250", price: 820, gradient: "from-gray-700 to-gray-900" },
-  { id: 6, name: "Colorante Artificial Cafe Caramelo 125", price: 260, gradient: "from-amber-700 to-amber-900" },
-  { id: 7, name: "Colorante Artificial Tropicolors Verde Limón 125 20kg", price: 3200, gradient: "from-green-400 to-emerald-600" },
-  { id: 8, name: "Colorante Naranja 850", price: 2400, gradient: "from-orange-400 to-orange-600" },
-  { id: 9, name: "Colorante Rosa Brillante 250", price: 6500, gradient: "from-pink-400 to-rose-600" },
-  { id: 10, name: "Colorante Rosa Brillante 125", price: 380, gradient: "from-pink-500 to-pink-700" },
-  { id: 11, name: "Exhibidor Amarillo Huevo 125 Sobres 100pz", price: 486, gradient: "from-yellow-400 to-yellow-600" },
-  { id: 12, name: "Colorante Artificial Violeta I Uso Industrial", price: 720, gradient: "from-violet-500 to-purple-600" },
-  { id: 13, name: "Colorante En Polvo Azul Tropicolors 100pz 5g", price: 490, gradient: "from-blue-400 to-blue-600" },
-  { id: 14, name: "Colorante Artificial Amarilo Naranja 250", price: 420, gradient: "from-yellow-500 to-orange-500" },
-  { id: 15, name: "Colorante Artificial Para Alimentos Amarillo Limón 250", price: 360, gradient: "from-yellow-300 to-yellow-500" },
+type ProductSection = { name: string; color: string; products: { id: number; name: string; price: number; gradient: string }[] };
+
+const productSections: ProductSection[] = [
+  {
+    name: "Rojos y Rosas",
+    color: "pink",
+    products: [
+      { id: 1, name: "Colorante Rosa Brillante 250 (comestible o limpieza) Rosa Chicle", price: 6500, gradient: "from-pink-400 to-rose-600" },
+      { id: 2, name: "Colorante Rosa Brillante 125 (comestible o limpieza) Rosa Brillante", price: 380, gradient: "from-pink-500 to-pink-700" },
+      { id: 3, name: "Exhibidor Sobres Rosa Brillante 125", price: 594, gradient: "from-pink-500 to-rose-500" },
+      { id: 4, name: "Colorante Rojo Fresa 125 1kg. Rojo", price: 340, gradient: "from-red-400 to-rose-500" },
+      { id: 5, name: "Colorante Rojo Fresa 250 Rojo", price: 669, gradient: "from-red-500 to-rose-600" },
+      { id: 6, name: "Colorante Rojo Grosella 250 1 Kg. - Rojo", price: 648, gradient: "from-red-600 to-red-800" },
+      { id: 7, name: "Colorante Rojo Uva 125 1 Kg.", price: 400, gradient: "from-red-500 to-red-700" },
+      { id: 8, name: "Colorante Rosa Brillante 250 (comestible o limpieza) Rosa Chicle", price: 700, gradient: "from-pink-500 to-rose-600" },
+      { id: 9, name: "Exhibidor Sobres Rosa Brillante 125 (comestible o limpieza) Rosa Brillante", price: 594, gradient: "from-pink-400 to-rose-500" },
+    ],
+  },
+  {
+    name: "Amarillos y Naranjas",
+    color: "yellow",
+    products: [
+      { id: 10, name: "Exhibidor Amarillo Huevo 125 Sobres 100pz Amarillo Huevo", price: 486, gradient: "from-yellow-400 to-yellow-600" },
+      { id: 11, name: "Colorante Artificial Amarillo Naranja 250", price: 420, gradient: "from-yellow-500 to-orange-500" },
+      { id: 12, name: "Colorante Artificial Para Alimentos Amarillo Limón 250", price: 360, gradient: "from-yellow-300 to-yellow-500" },
+      { id: 13, name: "Colorante Artificial Naranja 850", price: 3600, gradient: "from-orange-500 to-amber-500" },
+      { id: 14, name: "Colorante Naranja 850", price: 2400, gradient: "from-orange-400 to-orange-600" },
+      { id: 15, name: "Colorante Artificial Naranja 850 (para carne al pastor) 18pz", price: 3600, gradient: "from-orange-400 to-orange-600" },
+      { id: 16, name: "Colorante Artificial Amarillo Naranja 250 Naranja", price: 240, gradient: "from-yellow-500 to-orange-500" },
+      { id: 17, name: "Colorante Artificial Amarillo Huevo 250 Cubeta 20 Kg. Amarillo", price: 5616, gradient: "from-yellow-400 to-yellow-600" },
+      { id: 18, name: "Colorante Amarillo Limón 125 Cubeta 20 Kg. Amarillo", price: 3200, gradient: "from-yellow-300 to-yellow-500" },
+      { id: 19, name: "Tropicolors Colorante Amarillo Naranja 125 Cubeta 20 Kg. Naranja", price: 3780, gradient: "from-orange-400 to-orange-600" },
+      { id: 20, name: "Colorante Artificial Amarillo Limón 250 Amarillo Limón", price: 313, gradient: "from-yellow-300 to-yellow-500" },
+      { id: 21, name: "Colorante Amarillo Huevo 125 (pan, Pollo, Etc) Amarillo", price: 210, gradient: "from-yellow-400 to-yellow-600" },
+    ],
+  },
+  {
+    name: "Azules y Verdes",
+    color: "blue",
+    products: [
+      { id: 22, name: "Colorante Artificial Azul 125", price: 410, gradient: "from-blue-500 to-cyan-500" },
+      { id: 23, name: "Colorante Artificial Azul 125 (limpieza y alimentos) Azul", price: 410, gradient: "from-blue-400 to-cyan-500" },
+      { id: 24, name: "Colorante En Polvo Azul Tropicolors 100pz 5g. Azul", price: 490, gradient: "from-blue-400 to-blue-600" },
+      { id: 25, name: "Colorante Artificial Azul 250 Azul", price: 750, gradient: "from-blue-500 to-blue-700" },
+      { id: 26, name: "Colorante Artificial Tropicolors Verde Limón 125 6kg", price: 1050, gradient: "from-green-500 to-emerald-500" },
+      { id: 27, name: "Colorante Artificial Tropicolors Verde Limón 125 20kg", price: 3200, gradient: "from-green-400 to-emerald-600" },
+      { id: 28, name: "Colorante Artificial Verde Limón 125", price: 210, gradient: "from-green-400 to-emerald-500" },
+      { id: 29, name: "Colorante Artificial Verde Esmeralda 125", price: 270, gradient: "from-green-500 to-emerald-600" },
+      { id: 30, name: "Colorante Artificial Verde Limón 250", price: 313, gradient: "from-green-400 to-emerald-500" },
+      { id: 31, name: "Colorante Artificial Verde Esmeralda 250", price: 583, gradient: "from-green-500 to-emerald-700" },
+    ],
+  },
+  {
+    name: "Negros, Marrones y Violetas",
+    color: "gray",
+    products: [
+      { id: 32, name: "Colorante Artificial Negro 250", price: 820, gradient: "from-gray-700 to-gray-900" },
+      { id: 33, name: "Colorante Artificial Negro 250 100g.", price: 113, gradient: "from-gray-700 to-gray-900" },
+      { id: 34, name: "Colorante Artificial Negro 250 (alimentos y limpieza) Negro", price: 820, gradient: "from-gray-700 to-gray-900" },
+      { id: 35, name: "Colorante Artificial Cafe Caramelo 125", price: 260, gradient: "from-amber-700 to-amber-900" },
+      { id: 36, name: "Colorante Artificial Café Chocolate 250 1 Kg. Café Chocolate", price: 631, gradient: "from-amber-800 to-amber-900" },
+      { id: 37, name: "Colorante Artificial Violeta I Uso Industrial Violeta", price: 720, gradient: "from-violet-500 to-purple-600" },
+    ],
+  },
 ];
+
+const allProducts = productSections.flatMap(section => section.products);
 
 const benefits = [
   { icon: Droplet, title: "Alta Concentración", description: "Pequeñas cantidades para colores intensos y vibrantes" },
@@ -268,16 +318,28 @@ function Hero({ scrollToSection }: { scrollToSection: (id: string) => void }) {
 function ProductsSection({ cart, setCart }: { cart: CartItem[]; setCart: (cart: CartItem[]) => void }) {
   const [quantities, setQuantities] = useState<Record<number, number>>({});
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredProducts, setFilteredProducts] = useState(products);
+  const [filteredSections, setFilteredSections] = useState(productSections);
 
   useEffect(() => {
-    const filtered = products.filter(p =>
-      p.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredProducts(filtered);
+    if (!searchTerm.trim()) {
+      setFilteredSections(productSections);
+      return;
+    }
+    
+    const lowerSearch = searchTerm.toLowerCase();
+    const filtered = productSections
+      .map(section => ({
+        ...section,
+        products: section.products.filter(p =>
+          p.name.toLowerCase().includes(lowerSearch)
+        ),
+      }))
+      .filter(section => section.products.length > 0);
+    
+    setFilteredSections(filtered);
   }, [searchTerm]);
 
-  const handleAddToCart = (product: typeof products[0]) => {
+  const handleAddToCart = (product: (typeof allProducts)[0]) => {
     const quantity = quantities[product.id] || 1;
     const existingItem = cart.find(item => item.id === product.id);
     
@@ -322,74 +384,84 @@ function ProductsSection({ cart, setCart }: { cart: CartItem[]; setCart: (cart: 
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          {filteredProducts.map((product) => (
-            <Card key={product.id} className="group overflow-visible hover-elevate transition-all duration-300 flex flex-col" data-testid={`card-product-${product.id}`}>
-              <div className={`h-48 bg-gradient-to-br ${product.gradient} relative overflow-hidden rounded-t-xl`}>
-                <div className="absolute inset-0 bg-black/10" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center text-white">
-                    <Droplet className="w-16 h-16 mx-auto mb-2 opacity-90" />
-                    <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
-                      Colorante
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-              <CardContent className="p-6 space-y-4 flex-1 flex flex-col">
-                <div>
-                  <h3 className="text-xl font-semibold mb-2" data-testid={`text-product-name-${product.id}`}>{product.name}</h3>
-                  <p className="text-2xl font-bold text-primary">${product.price.toLocaleString('es-MX')}</p>
-                </div>
-
-                <div className="flex-1" />
-
-                <div className="space-y-3 pt-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-muted-foreground">Cantidad:</span>
-                    <div className="flex items-center border border-border rounded-md">
-                      <button
-                        onClick={() => updateQuantity(product.id, (quantities[product.id] || 1) - 1)}
-                        className="p-1 hover:bg-muted"
-                        data-testid={`button-decrease-${product.id}`}
-                      >
-                        <Minus className="w-4 h-4" />
-                      </button>
-                      <input
-                        type="number"
-                        min="1"
-                        value={quantities[product.id] || 1}
-                        onChange={(e) => updateQuantity(product.id, parseInt(e.target.value) || 1)}
-                        className="w-12 text-center border-0 focus:ring-0 text-sm"
-                        data-testid={`input-quantity-${product.id}`}
-                      />
-                      <button
-                        onClick={() => updateQuantity(product.id, (quantities[product.id] || 1) + 1)}
-                        className="p-1 hover:bg-muted"
-                        data-testid={`button-increase-${product.id}`}
-                      >
-                        <Plus className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-
-                  <Button
-                    onClick={() => handleAddToCart(product)}
-                    className="w-full bg-[#25D366] hover:bg-[#20BD5A] text-white border-[#20BD5A] gap-1.5"
-                    data-testid={`button-add-to-cart-${product.id}`}
-                  >
-                    <ShoppingCart className="w-4 h-4" />
-                    Agregar al Carrito
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {filteredProducts.length === 0 && (
+        {filteredSections.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground text-lg">No se encontraron productos que coincidan con tu búsqueda.</p>
+          </div>
+        ) : (
+          <div className="space-y-16">
+            {filteredSections.map((section) => (
+              <div key={section.name} className="space-y-8">
+                <div className="border-b-2 border-primary/20 pb-4">
+                  <h3 className="text-2xl sm:text-3xl font-bold text-foreground">{section.name}</h3>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                  {section.products.map((product) => (
+                    <Card key={product.id} className="group overflow-visible hover-elevate transition-all duration-300 flex flex-col" data-testid={`card-product-${product.id}`}>
+                      <div className={`h-48 bg-gradient-to-br ${product.gradient} relative overflow-hidden rounded-t-xl`}>
+                        <div className="absolute inset-0 bg-black/10" />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="text-center text-white">
+                            <Droplet className="w-16 h-16 mx-auto mb-2 opacity-90" />
+                            <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
+                              Colorante
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                      <CardContent className="p-6 space-y-4 flex-1 flex flex-col">
+                        <div>
+                          <h4 className="text-lg font-semibold mb-2" data-testid={`text-product-name-${product.id}`}>{product.name}</h4>
+                          <p className="text-2xl font-bold text-primary">${product.price.toLocaleString('es-MX')}</p>
+                        </div>
+
+                        <div className="flex-1" />
+
+                        <div className="space-y-3 pt-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-muted-foreground">Cantidad:</span>
+                            <div className="flex items-center border border-border rounded-md">
+                              <button
+                                onClick={() => updateQuantity(product.id, (quantities[product.id] || 1) - 1)}
+                                className="p-1 hover:bg-muted"
+                                data-testid={`button-decrease-${product.id}`}
+                              >
+                                <Minus className="w-4 h-4" />
+                              </button>
+                              <input
+                                type="number"
+                                min="1"
+                                value={quantities[product.id] || 1}
+                                onChange={(e) => updateQuantity(product.id, parseInt(e.target.value) || 1)}
+                                className="w-12 text-center border-0 focus:ring-0 text-sm"
+                                data-testid={`input-quantity-${product.id}`}
+                              />
+                              <button
+                                onClick={() => updateQuantity(product.id, (quantities[product.id] || 1) + 1)}
+                                className="p-1 hover:bg-muted"
+                                data-testid={`button-increase-${product.id}`}
+                              >
+                                <Plus className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+
+                          <Button
+                            onClick={() => handleAddToCart(product)}
+                            className="w-full bg-[#25D366] hover:bg-[#20BD5A] text-white border-[#20BD5A] gap-1.5"
+                            data-testid={`button-add-to-cart-${product.id}`}
+                          >
+                            <ShoppingCart className="w-4 h-4" />
+                            Agregar al Carrito
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
