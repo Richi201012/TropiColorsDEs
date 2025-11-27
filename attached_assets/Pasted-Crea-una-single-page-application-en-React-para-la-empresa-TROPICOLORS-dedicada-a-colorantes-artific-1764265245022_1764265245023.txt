@@ -1,0 +1,244 @@
+Crea una single-page application en React para la empresa TROPICOLORS, dedicada a colorantes artificiales para alimentos y productos de limpieza. Usa diseño moderno, limpio, responsivo y muy visual.
+
+La app debe funcionar en el template de React de Replit (Vite o CRA) y usar estos archivos principales:
+
+src/main.jsx
+
+src/App.jsx
+
+src/components/... (según convenga)
+
+src/styles.css (o similar)
+
+1. Referencias obligatorias
+
+Estilo/layout:
+https://mgx-8u5s7o11w3w.mgx.world/
+
+Catálogo / tipo de productos:
+https://www.mercadolibre.com.mx/pagina/tropicolors
+
+Usa MGX como inspiración de bloques grandes, tipografía moderna, espacios amplios y botones limpios.
+
+2. Datos reales de Tropicolors (úsalos en la UI)
+
+Nombre: Tropicolors
+
+Giro: Colorantes artificiales para alimentos y productos de limpieza
+
+WhatsApp / Teléfono: +52 55 5114 6856
+
+Link oficial de WhatsApp para cotizar (usar en TODOS los botones de cotización):
+https://wa.me/525551146856?text=Hola%20quiero%20cotizar%20colorantes%20Tropicolors
+
+Correo: tropicolors@hotmail.com
+
+Facebook: Tropicolors
+
+Horario: 9:00 – 18:00
+
+Logo: usar la imagen proporcionada por el usuario como logo principal (colocarlo en header y footer).
+
+3. Estructura de la app (componentes sugeridos)
+
+Crea componentes React funcionales:
+
+Header
+
+Hero
+
+ProductsSection
+
+AboutSection
+
+BenefitsSection
+
+WhatsAppCTA
+
+ContactSection
+
+Footer
+
+Opcional: FloatingWhatsAppButton, NavbarMobile, etc.
+
+En App.jsx importa todos los componentes y móstralos en orden.
+
+4. Contenido de cada sección
+a) Header
+
+Logo Tropicolors a la izquierda.
+
+Menú con scroll suave a secciones:
+Inicio | Productos | Sobre nosotros | Beneficios | Contacto | Cotizar.
+
+Botón en el header: “Cotizar por WhatsApp” → abre el link oficial en nueva pestaña.
+
+b) Hero (inicio)
+
+Bloque grande inspirando en MGX:
+
+Título principal:
+“Colorantes Artificiales Tropicolors”
+
+Subtítulo:
+“Alta concentración, colores intensos y calidad para tus alimentos.”
+
+Botones:
+
+“Ver productos” → hace scroll a sección Productos
+
+“Cotizar por WhatsApp” → abre enlace de WhatsApp
+
+Fondo blanco con detalles de manchas de color (por CSS).
+
+c) Sección de productos (ProductsSection)
+
+Usa un arreglo de objetos en React para simular productos (puedes definirlo en el mismo componente o exportarlo de un archivo data/products.js).
+
+Ejemplo de campos por producto:
+
+name
+
+description
+
+presentation (30 ml, 60 ml, 120 ml, 1 L, galón)
+
+colors
+
+type (líquido, gel, polvo)
+
+image (placeholder)
+
+Mostrar en cards responsivas (grid):
+
+Imagen
+
+Nombre
+
+Descripción breve
+
+Presentaciones y colores
+
+Botón “Comprar” (dummy, sin funcionalidad o con #)
+
+Botón “Cotizar por WhatsApp” con el enlace oficial.
+
+Mínimo 6 productos:
+
+Colorante líquido 30 ml
+
+Colorante líquido 60 ml
+
+Colorante líquido 120 ml
+
+Colorante en gel 30 ml
+
+Colorante en polvo
+
+Pack surtido de colores
+
+d) Sobre nosotros (AboutSection)
+
+Texto sugerido:
+
+“Tropicolors es una microempresa mexicana especializada en colorantes artificiales para alimentos y productos de limpieza. Nuestros productos ofrecen alta concentración, excelente rendimiento y colores vibrantes para repostería, bebidas, postres y más.”
+
+e) Beneficios (BenefitsSection)
+
+Mostrar tarjetas o íconos:
+
+Alta concentración
+
+Colores brillantes
+
+No altera sabor
+
+Económico y rendidor
+
+Apto para alimentos y bebidas
+
+Se mezcla fácilmente en agua o alcohol
+
+Presentaciones para negocio y hogar
+
+f) Sección de CTA WhatsApp (WhatsAppCTA)
+
+Bloque llamativo con fondo de color:
+
+Texto:
+
+“¿Quieres precios de mayoreo o una cotización personalizada?”
+
+Botón grande:
+
+“📲 Cotizar por WhatsApp”
+
+Enlace: https://wa.me/525551146856?text=Hola%20quiero%20cotizar%20colorantes%20Tropicolors
+
+g) Contacto (ContactSection)
+
+Mostrar claramente:
+
+Tel / WhatsApp: +52 55 5114 6856
+
+Correo: tropicolors@hotmail.com
+
+Facebook: Tropicolors
+
+Horario: 9:00 – 18:00
+
+Opcional: formulario simple (nombre, mensaje, correo) sin backend, solo estético.
+
+h) Footer
+
+Logo pequeño
+
+Texto: “© {año actual} Tropicolors. Todos los derechos reservados.”
+
+Links a WhatsApp, correo y Facebook.
+
+5. Estilos (CSS)
+
+Usa un solo archivo styles.css o módulos, pero aplícalo en toda la app.
+
+Tipografía: Google Fonts Poppins o Montserrat.
+
+Paleta:
+
+Azul #003F91
+
+Turquesa #00A8B5
+
+Amarillo #FFCD00
+
+Magenta #FF2E63
+
+Blanco #FFFFFF
+
+Botones redondeados, sombras suaves, animaciones :hover.
+
+Layout responsivo con flexbox y CSS grid.
+
+Navbar fija arriba en desktop y responsive en móvil.
+
+6. Funcionalidad extra en React
+
+Scroll suave al hacer clic en los enlaces del menú (puedes usar window.scrollTo o scrollIntoView con refs).
+
+Botón flotante de WhatsApp en la esquina inferior derecha que siempre use el mismo enlace.
+
+Animaciones suaves al hacer scroll (puede ser con CSS o una librería sencilla si está disponible).
+
+7. Resultado esperado
+
+Entregar el proyecto React funcionando, con:
+
+main.jsx que renderice <App />.
+
+App.jsx con la estructura de secciones.
+
+Componentes organizados en src/components.
+
+Estilos en styles.css.
+
+Todos los botones de cotización apuntando al enlace oficial de WhatsApp.
