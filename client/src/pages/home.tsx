@@ -129,68 +129,67 @@ function ParticleField() {
 
 const WHATSAPP_LINK = "https://wa.me/525551146856";
 
-type ProductSection = { name: string; color: string; products: { id: number; name: string; price: number; gradient: string }[] };
+type ProductSection = { name: string; color: string; products: { id: number; name: string; description: string; price: number; size: string; use: string; gradient: string }[] };
 
 const productSections: ProductSection[] = [
   {
     name: "Rojos y Rosas",
     color: "pink",
     products: [
-      { id: 1, name: "Colorante Rosa Brillante 250 (comestible o limpieza) Rosa Chicle", price: 6500, gradient: "from-pink-400 to-rose-600" },
-      { id: 2, name: "Colorante Rosa Brillante 125 (comestible o limpieza) Rosa Brillante", price: 380, gradient: "from-pink-500 to-pink-700" },
-      { id: 3, name: "Exhibidor Sobres Rosa Brillante 125", price: 594, gradient: "from-pink-500 to-rose-500" },
-      { id: 4, name: "Colorante Rojo Fresa 125 1kg. Rojo", price: 340, gradient: "from-red-400 to-rose-500" },
-      { id: 5, name: "Colorante Rojo Fresa 250 Rojo", price: 669, gradient: "from-red-500 to-rose-600" },
-      { id: 6, name: "Colorante Rojo Grosella 250 1 Kg. - Rojo", price: 648, gradient: "from-red-600 to-red-800" },
-      { id: 7, name: "Colorante Rojo Uva 125 1 Kg.", price: 400, gradient: "from-red-500 to-red-700" },
-      { id: 8, name: "Colorante Rosa Brillante 250 (comestible o limpieza) Rosa Chicle", price: 700, gradient: "from-pink-500 to-rose-600" },
-      { id: 9, name: "Exhibidor Sobres Rosa Brillante 125 (comestible o limpieza) Rosa Brillante", price: 594, gradient: "from-pink-400 to-rose-500" },
+      { id: 1, name: "Rosa Brillante 250", description: "Colorante artificial para alimentos y limpieza. Tono rosa chicle intenso.", price: 6500, size: "10 Kg", use: "Alimentos y Limpieza", gradient: "from-pink-400 to-rose-600" },
+      { id: 2, name: "Rosa Brillante 125", description: "Colorante artificial comestible y para limpieza. Color rosa brillante vibrante.", price: 380, size: "1 Kg", use: "Alimentos y Limpieza", gradient: "from-pink-500 to-pink-700" },
+      { id: 3, name: "Rosa Brillante Sobres", description: "Exhibidor con sobres individuales de 5g. Ideal para uso doméstico.", price: 594, size: "100 sobres x 5g", use: "Alimentos y Limpieza", gradient: "from-pink-500 to-rose-500" },
+      { id: 4, name: "Rojo Fresa 125", description: "Colorante artificial rojo fresa. Ideal para bebidas, postres y repostería.", price: 340, size: "1 Kg", use: "Alimentos", gradient: "from-red-400 to-rose-500" },
+      { id: 5, name: "Rojo Fresa 250", description: "Colorante rojo fresa concentrado. Mayor rendimiento para uso profesional.", price: 669, size: "1 Kg", use: "Alimentos", gradient: "from-red-500 to-rose-600" },
+      { id: 6, name: "Rojo Grosella 250", description: "Colorante rojo grosella intenso. Excelente para bebidas y postres.", price: 648, size: "1 Kg", use: "Alimentos", gradient: "from-red-600 to-red-800" },
+      { id: 7, name: "Rojo Uva 125", description: "Colorante artificial tono uva. Perfecto para aguas frescas y gelatinas.", price: 400, size: "1 Kg", use: "Alimentos", gradient: "from-red-500 to-red-700" },
+      { id: 8, name: "Rojo Púrpura 125", description: "Colorante rojo púrpura para alimentos. Tono elegante y vibrante.", price: 320, size: "1 Kg", use: "Alimentos", gradient: "from-rose-500 to-purple-600" },
+      { id: 9, name: "Rosa Brillante Cubeta", description: "Presentación industrial en cubeta. Ideal para negocios de alto volumen.", price: 5800, size: "20 Kg", use: "Alimentos y Limpieza", gradient: "from-pink-400 to-rose-500" },
     ],
   },
   {
     name: "Amarillos y Naranjas",
     color: "yellow",
     products: [
-      { id: 10, name: "Exhibidor Amarillo Huevo 125 Sobres 100pz Amarillo Huevo", price: 486, gradient: "from-yellow-400 to-yellow-600" },
-      { id: 11, name: "Colorante Artificial Amarillo Naranja 250", price: 420, gradient: "from-yellow-500 to-orange-500" },
-      { id: 12, name: "Colorante Artificial Para Alimentos Amarillo Limón 250", price: 360, gradient: "from-yellow-300 to-yellow-500" },
-      { id: 13, name: "Colorante Artificial Naranja 850", price: 3600, gradient: "from-orange-500 to-amber-500" },
-      { id: 14, name: "Colorante Naranja 850", price: 2400, gradient: "from-orange-400 to-orange-600" },
-      { id: 15, name: "Colorante Artificial Naranja 850 (para carne al pastor) 18pz", price: 3600, gradient: "from-orange-400 to-orange-600" },
-      { id: 16, name: "Colorante Artificial Amarillo Naranja 250 Naranja", price: 240, gradient: "from-yellow-500 to-orange-500" },
-      { id: 17, name: "Colorante Artificial Amarillo Huevo 250 Cubeta 20 Kg. Amarillo", price: 5616, gradient: "from-yellow-400 to-yellow-600" },
-      { id: 18, name: "Colorante Amarillo Limón 125 Cubeta 20 Kg. Amarillo", price: 3200, gradient: "from-yellow-300 to-yellow-500" },
-      { id: 19, name: "Tropicolors Colorante Amarillo Naranja 125 Cubeta 20 Kg. Naranja", price: 3780, gradient: "from-orange-400 to-orange-600" },
-      { id: 20, name: "Colorante Artificial Amarillo Limón 250 Amarillo Limón", price: 313, gradient: "from-yellow-300 to-yellow-500" },
-      { id: 21, name: "Colorante Amarillo Huevo 125 (pan, Pollo, Etc) Amarillo", price: 210, gradient: "from-yellow-400 to-yellow-600" },
+      { id: 10, name: "Amarillo Huevo 125 Sobres", description: "Exhibidor con 100 sobres. Ideal para panadería, pollo y pastas.", price: 486, size: "100 sobres x 5g", use: "Alimentos (Pan, Pollo)", gradient: "from-yellow-400 to-yellow-600" },
+      { id: 11, name: "Amarillo Naranja 250", description: "Colorante artificial amarillo-naranja concentrado. Alta intensidad de color.", price: 420, size: "1 Kg", use: "Alimentos", gradient: "from-yellow-500 to-orange-500" },
+      { id: 12, name: "Amarillo Limón 250", description: "Colorante amarillo limón para alimentos. Tono brillante y natural.", price: 360, size: "1 Kg", use: "Alimentos", gradient: "from-yellow-300 to-yellow-500" },
+      { id: 13, name: "Naranja 850 Pack 18pz", description: "Pack de 18 piezas especial para carne al pastor. Color naranja intenso.", price: 3600, size: "18 piezas x 250g", use: "Carne Al Pastor", gradient: "from-orange-500 to-amber-500" },
+      { id: 14, name: "Naranja 850 Pack 12pz", description: "Pack de 12 piezas para tacos al pastor. Rinde para grandes cantidades.", price: 2400, size: "12 piezas x 250g", use: "Carne Al Pastor", gradient: "from-orange-400 to-orange-600" },
+      { id: 15, name: "Naranja 850 Individual", description: "Colorante naranja especial para carne al pastor. Presentación individual.", price: 240, size: "250g", use: "Carne Al Pastor", gradient: "from-orange-400 to-orange-600" },
+      { id: 16, name: "Amarillo Naranja 125", description: "Colorante amarillo-naranja claro. Perfecto para bebidas y postres.", price: 240, size: "1 Kg", use: "Alimentos", gradient: "from-yellow-500 to-orange-500" },
+      { id: 17, name: "Amarillo Huevo 250 Cubeta", description: "Cubeta industrial de 20 Kg. Para negocios de panadería y pollo.", price: 5616, size: "20 Kg", use: "Alimentos (Pan, Pollo)", gradient: "from-yellow-400 to-yellow-600" },
+      { id: 18, name: "Amarillo Limón 125 Cubeta", description: "Cubeta de 20 Kg. Ideal para negocios con alto consumo.", price: 3200, size: "20 Kg", use: "Alimentos", gradient: "from-yellow-300 to-yellow-500" },
+      { id: 19, name: "Amarillo Naranja 125 Cubeta", description: "Cubeta industrial. Rendimiento profesional para grandes producciones.", price: 3780, size: "20 Kg", use: "Alimentos", gradient: "from-orange-400 to-orange-600" },
+      { id: 20, name: "Amarillo Canario Cubeta", description: "Colorante amarillo canario en cubeta. Tono brillante y vibrante.", price: 3456, size: "20 Kg", use: "Alimentos", gradient: "from-yellow-300 to-yellow-500" },
+      { id: 21, name: "Amarillo Huevo 125", description: "Colorante para pan, pollo, pastas y más. Uso profesional y doméstico.", price: 210, size: "1 Kg", use: "Alimentos (Pan, Pollo)", gradient: "from-yellow-400 to-yellow-600" },
+      { id: 22, name: "Amarillo Huevo 250", description: "Concentración alta para mayor rendimiento. Ideal para grandes producciones.", price: 420, size: "1 Kg", use: "Alimentos", gradient: "from-yellow-400 to-yellow-600" },
     ],
   },
   {
     name: "Azules y Verdes",
     color: "blue",
     products: [
-      { id: 22, name: "Colorante Artificial Azul 125", price: 410, gradient: "from-blue-500 to-cyan-500" },
-      { id: 23, name: "Colorante Artificial Azul 125 (limpieza y alimentos) Azul", price: 410, gradient: "from-blue-400 to-cyan-500" },
-      { id: 24, name: "Colorante En Polvo Azul Tropicolors 100pz 5g. Azul", price: 490, gradient: "from-blue-400 to-blue-600" },
-      { id: 25, name: "Colorante Artificial Azul 250 Azul", price: 750, gradient: "from-blue-500 to-blue-700" },
-      { id: 26, name: "Colorante Artificial Tropicolors Verde Limón 125 6kg", price: 1050, gradient: "from-green-500 to-emerald-500" },
-      { id: 27, name: "Colorante Artificial Tropicolors Verde Limón 125 20kg", price: 3200, gradient: "from-green-400 to-emerald-600" },
-      { id: 28, name: "Colorante Artificial Verde Limón 125", price: 210, gradient: "from-green-400 to-emerald-500" },
-      { id: 29, name: "Colorante Artificial Verde Esmeralda 125", price: 270, gradient: "from-green-500 to-emerald-600" },
-      { id: 30, name: "Colorante Artificial Verde Limón 250", price: 313, gradient: "from-green-400 to-emerald-500" },
-      { id: 31, name: "Colorante Artificial Verde Esmeralda 250", price: 583, gradient: "from-green-500 to-emerald-700" },
+      { id: 23, name: "Azul 125", description: "Colorante artificial azul para alimentos y limpieza. Color intenso.", price: 410, size: "1 Kg", use: "Alimentos y Limpieza", gradient: "from-blue-500 to-cyan-500" },
+      { id: 24, name: "Azul Sobres 100pz", description: "Exhibidor con 100 sobres de 5g. Práctico para uso individual.", price: 490, size: "100 sobres x 5g", use: "Alimentos", gradient: "from-blue-400 to-blue-600" },
+      { id: 25, name: "Azul 250", description: "Colorante azul concentrado. Mayor intensidad y rendimiento.", price: 750, size: "1 Kg", use: "Alimentos", gradient: "from-blue-500 to-blue-700" },
+      { id: 26, name: "Verde Limón 125 (6 Kg)", description: "Presentación de 6 Kg. Ideal para negocios medianos.", price: 1050, size: "6 Kg", use: "Alimentos", gradient: "from-green-500 to-emerald-500" },
+      { id: 27, name: "Verde Limón 125 Cubeta", description: "Cubeta industrial de 20 Kg. Para alto consumo.", price: 3200, size: "20 Kg", use: "Alimentos", gradient: "from-green-400 to-emerald-600" },
+      { id: 28, name: "Verde Limón 125", description: "Colorante verde limón brillante. Tono fresco y vibrante.", price: 210, size: "1 Kg", use: "Alimentos", gradient: "from-green-400 to-emerald-500" },
+      { id: 29, name: "Verde Esmeralda 125", description: "Colorante verde esmeralda intenso. Ideal para bebidas y postres.", price: 270, size: "1 Kg", use: "Alimentos", gradient: "from-green-500 to-emerald-600" },
+      { id: 30, name: "Verde Limón 250", description: "Verde limón concentrado. Mayor rendimiento por kilogramo.", price: 313, size: "1 Kg", use: "Alimentos", gradient: "from-green-400 to-emerald-500" },
+      { id: 31, name: "Verde Esmeralda 250", description: "Verde esmeralda alta concentración. Color profundo y elegante.", price: 583, size: "1 Kg", use: "Alimentos", gradient: "from-green-500 to-emerald-700" },
     ],
   },
   {
     name: "Negros, Marrones y Violetas",
     color: "gray",
     products: [
-      { id: 32, name: "Colorante Artificial Negro 250", price: 820, gradient: "from-gray-700 to-gray-900" },
-      { id: 33, name: "Colorante Artificial Negro 250 100g.", price: 113, gradient: "from-gray-700 to-gray-900" },
-      { id: 34, name: "Colorante Artificial Negro 250 (alimentos y limpieza) Negro", price: 820, gradient: "from-gray-700 to-gray-900" },
-      { id: 35, name: "Colorante Artificial Cafe Caramelo 125", price: 260, gradient: "from-amber-700 to-amber-900" },
-      { id: 36, name: "Colorante Artificial Café Chocolate 250 1 Kg. Café Chocolate", price: 631, gradient: "from-amber-800 to-amber-900" },
-      { id: 37, name: "Colorante Artificial Violeta I Uso Industrial Violeta", price: 720, gradient: "from-violet-500 to-purple-600" },
+      { id: 32, name: "Negro 250 (1 Kg)", description: "Colorante negro para alimentos y limpieza. Color intenso y uniforme.", price: 820, size: "1 Kg", use: "Alimentos y Limpieza", gradient: "from-gray-700 to-gray-900" },
+      { id: 33, name: "Negro 250 (100g)", description: "Presentación pequeña ideal para uso doméstico o pruebas.", price: 113, size: "100g", use: "Alimentos", gradient: "from-gray-700 to-gray-900" },
+      { id: 34, name: "Café Caramelo 125", description: "Colorante café caramelo. Perfecto para postres y bebidas de café.", price: 260, size: "1 Kg", use: "Alimentos", gradient: "from-amber-700 to-amber-900" },
+      { id: 35, name: "Café Chocolate 250", description: "Colorante café chocolate intenso. Ideal para repostería y bebidas.", price: 631, size: "1 Kg", use: "Alimentos", gradient: "from-amber-800 to-amber-900" },
+      { id: 36, name: "Violeta Industrial", description: "Colorante violeta para uso industrial. Alta concentración.", price: 720, size: "1 Kg", use: "Industrial", gradient: "from-violet-500 to-purple-600" },
     ],
   },
 ];
@@ -642,7 +641,12 @@ function ProductsSection({ cart, setCart }: { cart: CartItem[]; setCart: (cart: 
                   </div>
                   <CardContent className="p-6 space-y-4 flex-1 flex flex-col">
                     <div>
-                      <h4 className="text-lg font-semibold mb-2 line-clamp-2" data-testid={`text-product-name-${product.id}`}>{product.name}</h4>
+                      <h4 className="text-lg font-semibold mb-1" data-testid={`text-product-name-${product.id}`}>{product.name}</h4>
+                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{product.description}</p>
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        <Badge variant="outline" className="text-xs">{product.size}</Badge>
+                        <Badge variant="secondary" className="text-xs">{product.use}</Badge>
+                      </div>
                       <p className="text-2xl font-bold text-primary">${product.price.toLocaleString('es-MX')}</p>
                     </div>
 
@@ -728,7 +732,7 @@ function AboutSection() {
                 <p className="text-sm text-muted-foreground mt-2">Clientes Satisfechos</p>
               </div>
               <div className="text-center sm:text-left">
-                <div className="text-3xl sm:text-4xl font-bold text-primary">37+</div>
+                <div className="text-3xl sm:text-4xl font-bold text-primary">36+</div>
                 <p className="text-sm text-muted-foreground mt-2">Productos</p>
               </div>
               <div className="text-center sm:text-left">
