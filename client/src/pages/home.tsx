@@ -22,6 +22,8 @@ import {
   Minus,
   Trash2,
   ShoppingCart,
+  Search,
+  Star,
 } from "lucide-react";
 import { SiFacebook, SiWhatsapp } from "react-icons/si";
 import { useState, useEffect } from "react";
@@ -30,151 +32,99 @@ import logoImage from "@assets/logo-2021100510533067100_1764265250371.jpeg";
 const WHATSAPP_LINK = "https://wa.me/525551146856";
 
 const products = [
-  {
-    id: 1,
-    name: "Colorante Artificial Azul 125",
-    price: 410,
-    gradient: "from-blue-500 to-cyan-500",
-  },
-  {
-    id: 2,
-    name: "Colorante Artificial Naranja 850",
-    price: 3600,
-    gradient: "from-orange-500 to-amber-500",
-  },
-  {
-    id: 3,
-    name: "Exhibidor Sobres Rosa Brillante 125",
-    price: 594,
-    gradient: "from-pink-500 to-rose-500",
-  },
-  {
-    id: 4,
-    name: "Colorante Artificial Tropicolors Verde Limón 125 6kg",
-    price: 1050,
-    gradient: "from-green-500 to-emerald-500",
-  },
-  {
-    id: 5,
-    name: "Colorante Artificial Negro 250",
-    price: 820,
-    gradient: "from-gray-700 to-gray-900",
-  },
-  {
-    id: 6,
-    name: "Colorante Artificial Cafe Caramelo 125",
-    price: 260,
-    gradient: "from-amber-700 to-amber-900",
-  },
-  {
-    id: 7,
-    name: "Colorante Artificial Tropicolors Verde Limón 125 20kg",
-    price: 3200,
-    gradient: "from-green-400 to-emerald-600",
-  },
-  {
-    id: 8,
-    name: "Colorante Naranja 850",
-    price: 2400,
-    gradient: "from-orange-400 to-orange-600",
-  },
-  {
-    id: 9,
-    name: "Colorante Rosa Brillante 250",
-    price: 6500,
-    gradient: "from-pink-400 to-rose-600",
-  },
-  {
-    id: 10,
-    name: "Colorante Rosa Brillante 125",
-    price: 380,
-    gradient: "from-pink-500 to-pink-700",
-  },
-  {
-    id: 11,
-    name: "Exhibidor Amarillo Huevo 125 Sobres 100pz",
-    price: 486,
-    gradient: "from-yellow-400 to-yellow-600",
-  },
-  {
-    id: 12,
-    name: "Colorante Artificial Violeta I Uso Industrial",
-    price: 720,
-    gradient: "from-violet-500 to-purple-600",
-  },
-  {
-    id: 13,
-    name: "Colorante En Polvo Azul Tropicolors 100pz 5g",
-    price: 490,
-    gradient: "from-blue-400 to-blue-600",
-  },
-  {
-    id: 14,
-    name: "Colorante Artificial Amarilo Naranja 250",
-    price: 420,
-    gradient: "from-yellow-500 to-orange-500",
-  },
-  {
-    id: 15,
-    name: "Colorante Artificial Para Alimentos Amarillo Limón 250",
-    price: 360,
-    gradient: "from-yellow-300 to-yellow-500",
-  },
+  { id: 1, name: "Colorante Artificial Azul 125", price: 410, gradient: "from-blue-500 to-cyan-500" },
+  { id: 2, name: "Colorante Artificial Naranja 850", price: 3600, gradient: "from-orange-500 to-amber-500" },
+  { id: 3, name: "Exhibidor Sobres Rosa Brillante 125", price: 594, gradient: "from-pink-500 to-rose-500" },
+  { id: 4, name: "Colorante Artificial Tropicolors Verde Limón 125 6kg", price: 1050, gradient: "from-green-500 to-emerald-500" },
+  { id: 5, name: "Colorante Artificial Negro 250", price: 820, gradient: "from-gray-700 to-gray-900" },
+  { id: 6, name: "Colorante Artificial Cafe Caramelo 125", price: 260, gradient: "from-amber-700 to-amber-900" },
+  { id: 7, name: "Colorante Artificial Tropicolors Verde Limón 125 20kg", price: 3200, gradient: "from-green-400 to-emerald-600" },
+  { id: 8, name: "Colorante Naranja 850", price: 2400, gradient: "from-orange-400 to-orange-600" },
+  { id: 9, name: "Colorante Rosa Brillante 250", price: 6500, gradient: "from-pink-400 to-rose-600" },
+  { id: 10, name: "Colorante Rosa Brillante 125", price: 380, gradient: "from-pink-500 to-pink-700" },
+  { id: 11, name: "Exhibidor Amarillo Huevo 125 Sobres 100pz", price: 486, gradient: "from-yellow-400 to-yellow-600" },
+  { id: 12, name: "Colorante Artificial Violeta I Uso Industrial", price: 720, gradient: "from-violet-500 to-purple-600" },
+  { id: 13, name: "Colorante En Polvo Azul Tropicolors 100pz 5g", price: 490, gradient: "from-blue-400 to-blue-600" },
+  { id: 14, name: "Colorante Artificial Amarilo Naranja 250", price: 420, gradient: "from-yellow-500 to-orange-500" },
+  { id: 15, name: "Colorante Artificial Para Alimentos Amarillo Limón 250", price: 360, gradient: "from-yellow-300 to-yellow-500" },
 ];
 
 const benefits = [
+  { icon: Droplet, title: "Alta Concentración", description: "Pequeñas cantidades para colores intensos y vibrantes" },
+  { icon: Sparkles, title: "Colores Brillantes", description: "Tonos vivos que destacan en cualquier preparación" },
+  { icon: ThumbsUp, title: "No Altera Sabor", description: "Fórmula neutra que no modifica el gusto de tus recetas" },
+  { icon: Wallet, title: "Económico y Rendidor", description: "Máximo rendimiento con mínima cantidad de producto" },
+  { icon: Utensils, title: "Apto para Alimentos", description: "Seguro para bebidas, postres, repostería y más" },
+  { icon: Droplets, title: "Fácil de Mezclar", description: "Se disuelve rápidamente en agua o alcohol" },
+  { icon: Package, title: "Variedad de Presentaciones", description: "Tamaños para uso doméstico y profesional" },
+];
+
+const testimonials = [
   {
-    icon: Droplet,
-    title: "Alta Concentración",
-    description: "Pequeñas cantidades para colores intensos y vibrantes",
+    id: 1,
+    name: "María López",
+    business: "Repostería Dulce Sueño",
+    rating: 5,
+    text: "Los colorantes de Tropicolors son excelentes. Mis pasteles se ven mucho más vibrantes y los clientes están encantados con los resultados.",
+    image: "ML",
   },
   {
-    icon: Sparkles,
-    title: "Colores Brillantes",
-    description: "Tonos vivos que destacan en cualquier preparación",
+    id: 2,
+    name: "Carlos Mendoza",
+    business: "Panadería La Tradicional",
+    rating: 5,
+    text: "Llevo 3 años usando sus productos. La calidad es consistente y el precio es muy competitivo. Totalmente recomendado.",
+    image: "CM",
   },
   {
-    icon: ThumbsUp,
-    title: "No Altera Sabor",
-    description: "Fórmula neutra que no modifica el gusto de tus recetas",
-  },
-  {
-    icon: Wallet,
-    title: "Económico y Rendidor",
-    description: "Máximo rendimiento con mínima cantidad de producto",
-  },
-  {
-    icon: Utensils,
-    title: "Apto para Alimentos",
-    description: "Seguro para bebidas, postres, repostería y más",
-  },
-  {
-    icon: Droplets,
-    title: "Fácil de Mezclar",
-    description: "Se disuelve rápidamente en agua o alcohol",
-  },
-  {
-    icon: Package,
-    title: "Variedad de Presentaciones",
-    description: "Tamaños para uso doméstico y profesional",
+    id: 3,
+    name: "Ana García",
+    business: "Negocio de Bebidas Gourmet",
+    rating: 5,
+    text: "Excelente servicio y productos. El equipo de Tropicolors siempre está disponible para ayudar con las cotizaciones.",
+    image: "AG",
   },
 ];
 
-type CartItem = {
-  id: number;
-  name: string;
-  price: number;
-  quantity: number;
-};
+const recipes = [
+  {
+    id: 1,
+    title: "Cupcakes con Frosting Turquesa",
+    description: "Aprende a crear cupcakes con frosting en un hermoso color turquesa usando colorantes Tropicolors. Perfecto para cumpleaños.",
+    color: "turquoise",
+    icon: "🧁",
+  },
+  {
+    id: 2,
+    title: "Bebida Tropical Azul",
+    description: "Crea una bebida refrescante con un vibrante color azul. Ideal para fiestas de verano con nuestros colorantes líquidos.",
+    color: "blue",
+    icon: "🥤",
+  },
+  {
+    id: 3,
+    title: "Glaseado Rosa Brillante",
+    description: "Un glaseado perfecto para decorar galletas y pasteles. Aprende la técnica correcta para obtener ese rosa brillante.",
+    color: "pink",
+    icon: "🍪",
+  },
+  {
+    id: 4,
+    title: "Macarrones Arcoíris",
+    description: "Los macarrones franceses en múltiples colores son mucho más fáciles con nuestros colorantes en polvo de alta concentración.",
+    color: "rainbow",
+    icon: "🌈",
+  },
+];
+
+type CartItem = { id: number; name: string; price: number; quantity: number };
 
 function Header({ scrollToSection, cartCount, onCartClick }: { scrollToSection: (id: string) => void; cartCount: number; onCartClick: () => void }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -184,18 +134,12 @@ function Header({ scrollToSection, cartCount, onCartClick }: { scrollToSection: 
     { label: "Productos", id: "productos" },
     { label: "Nosotros", id: "nosotros" },
     { label: "Beneficios", id: "beneficios" },
+    { label: "Recetas", id: "recetas" },
     { label: "Contacto", id: "contacto" },
   ];
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "bg-background/95 backdrop-blur-md shadow-lg border-b border-border"
-          : "bg-transparent"
-      }`}
-      data-testid="header"
-    >
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "bg-background/95 backdrop-blur-md shadow-lg border-b border-border" : "bg-transparent"}`} data-testid="header">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => scrollToSection("inicio")} data-testid="link-logo">
@@ -216,13 +160,7 @@ function Header({ scrollToSection, cartCount, onCartClick }: { scrollToSection: 
           </nav>
 
           <div className="hidden sm:flex items-center gap-3">
-            <Button
-              onClick={onCartClick}
-              variant="outline"
-              size="icon"
-              className="relative"
-              data-testid="button-cart"
-            >
+            <Button onClick={onCartClick} variant="outline" size="icon" className="relative" data-testid="button-cart">
               <ShoppingCart className="w-4 h-4" />
               {cartCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-primary text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
@@ -236,8 +174,7 @@ function Header({ scrollToSection, cartCount, onCartClick }: { scrollToSection: 
               data-testid="button-whatsapp-header"
             >
               <SiWhatsapp className="w-4 h-4" />
-              <span className="hidden md:inline">Cotizar por WhatsApp</span>
-              <span className="md:hidden">Cotizar</span>
+              <span className="hidden md:inline">Cotizar</span>
             </Button>
           </div>
 
@@ -283,7 +220,7 @@ function Header({ scrollToSection, cartCount, onCartClick }: { scrollToSection: 
                 data-testid="button-whatsapp-mobile"
               >
                 <SiWhatsapp className="w-4 h-4" />
-                Cotizar por WhatsApp
+                Cotizar
               </Button>
             </div>
           </nav>
@@ -301,7 +238,6 @@ function Hero({ scrollToSection }: { scrollToSection: (id: string) => void }) {
       data-testid="section-hero"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-muted/30" />
-      
       <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-br from-[hsl(var(--tropicolors-magenta))] to-transparent opacity-20 rounded-full blur-3xl motion-safe:animate-pulse" />
       <div className="absolute top-40 right-20 w-96 h-96 bg-gradient-to-bl from-[hsl(var(--tropicolors-turquoise))] to-transparent opacity-15 rounded-full blur-3xl motion-safe:animate-pulse" style={{ animationDelay: "1s" }} />
       <div className="absolute bottom-20 left-1/4 w-80 h-80 bg-gradient-to-tr from-[hsl(var(--tropicolors-yellow))] to-transparent opacity-15 rounded-full blur-3xl motion-safe:animate-pulse" style={{ animationDelay: "2s" }} />
@@ -362,6 +298,15 @@ function Hero({ scrollToSection }: { scrollToSection: (id: string) => void }) {
 
 function ProductsSection({ cart, setCart }: { cart: CartItem[]; setCart: (cart: CartItem[]) => void }) {
   const [quantities, setQuantities] = useState<Record<number, number>>({});
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState(products);
+
+  useEffect(() => {
+    const filtered = products.filter(p =>
+      p.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredProducts(filtered);
+  }, [searchTerm]);
 
   const handleAddToCart = (product: typeof products[0]) => {
     const quantity = quantities[product.id] || 1;
@@ -381,26 +326,35 @@ function ProductsSection({ cart, setCart }: { cart: CartItem[]; setCart: (cart: 
   };
 
   const updateQuantity = (id: number, value: number) => {
-    if (value > 0) {
-      setQuantities(prev => ({ ...prev, [id]: value }));
-    }
+    if (value > 0) setQuantities(prev => ({ ...prev, [id]: value }));
   };
 
   return (
     <section id="productos" className="py-20 sm:py-28 bg-muted/30" data-testid="section-productos">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
+        <div className="text-center mb-12">
           <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm">Catálogo</Badge>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
             Nuestros <span className="text-primary">Productos</span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
             Descubre nuestra línea completa de colorantes artificiales para todas tus necesidades
           </p>
+
+          <div className="relative max-w-md mx-auto">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <Input
+              placeholder="Buscar colorantes..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-12 h-11"
+              data-testid="input-product-search"
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          {products.map((product) => (
+          {filteredProducts.map((product) => (
             <Card key={product.id} className="group overflow-visible hover-elevate transition-all duration-300 flex flex-col" data-testid={`card-product-${product.id}`}>
               <div className={`h-48 bg-gradient-to-br ${product.gradient} relative overflow-hidden rounded-t-xl`}>
                 <div className="absolute inset-0 bg-black/10" />
@@ -463,6 +417,12 @@ function ProductsSection({ cart, setCart }: { cart: CartItem[]; setCart: (cart: 
             </Card>
           ))}
         </div>
+
+        {filteredProducts.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground text-lg">No se encontraron productos que coincidan con tu búsqueda.</p>
+          </div>
+        )}
       </div>
     </section>
   );
@@ -590,6 +550,94 @@ function BenefitsSection() {
   );
 }
 
+function TestimonialsSection() {
+  return (
+    <section className="py-20 sm:py-28 bg-muted/30" data-testid="section-testimonials">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm">Testimonios</Badge>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
+            Lo que dicen nuestros <span className="text-primary">clientes</span>
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Conoce las experiencias de empresas que confían en Tropicolors
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          {testimonials.map((testimonial) => (
+            <Card key={testimonial.id} className="hover-elevate" data-testid={`card-testimonial-${testimonial.id}`}>
+              <CardContent className="p-6 space-y-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                      <span className="font-bold text-primary">{testimonial.image}</span>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold">{testimonial.name}</h4>
+                      <p className="text-sm text-muted-foreground">{testimonial.business}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-1">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-primary text-primary" />
+                  ))}
+                </div>
+
+                <p className="text-muted-foreground text-sm leading-relaxed">"{testimonial.text}"</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function RecipesSection({ scrollToSection }: { scrollToSection: (id: string) => void }) {
+  return (
+    <section id="recetas" className="py-20 sm:py-28" data-testid="section-recipes">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm">Blog</Badge>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
+            Recetas y <span className="text-primary">Aplicaciones</span>
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Descubre ideas creativas para usar nuestros colorantes en tus preparaciones favoritas
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+          {recipes.map((recipe) => (
+            <Card key={recipe.id} className="hover-elevate overflow-hidden" data-testid={`card-recipe-${recipe.id}`}>
+              <div className={`h-40 bg-gradient-to-br from-${recipe.color}-400 to-${recipe.color}-600 flex items-center justify-center text-6xl`}>
+                {recipe.icon}
+              </div>
+              <CardContent className="p-6 space-y-4">
+                <div>
+                  <h3 className="text-2xl font-semibold mb-2">{recipe.title}</h3>
+                  <p className="text-muted-foreground">{recipe.description}</p>
+                </div>
+                <Button
+                  onClick={() => scrollToSection("productos")}
+                  variant="outline"
+                  className="w-full"
+                  data-testid={`button-recipe-products-${recipe.id}`}
+                >
+                  Ver Colorantes
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function WhatsAppCTA() {
   return (
     <section className="py-20 sm:py-28 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10" data-testid="section-whatsapp-cta">
@@ -616,6 +664,38 @@ function WhatsAppCTA() {
 }
 
 function ContactSection() {
+  const [formData, setFormData] = useState({ name: "", email: "", phone: "", message: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.name || !formData.email || !formData.message) {
+      setSubmitStatus("error");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        setSubmitStatus("success");
+        setFormData({ name: "", email: "", phone: "", message: "" });
+      } else {
+        setSubmitStatus("error");
+      }
+    } catch {
+      setSubmitStatus("error");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <section id="contacto" className="py-20 sm:py-28" data-testid="section-contacto">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -629,11 +709,13 @@ function ContactSection() {
         <div className="grid lg:grid-cols-2 gap-8">
           <Card className="hover-elevate">
             <CardContent className="p-8 space-y-6">
-              <form className="space-y-4">
+              <form className="space-y-4" onSubmit={handleSubmit}>
                 <div>
                   <label className="text-sm font-medium mb-2 block">Nombre</label>
                   <Input
                     placeholder="Tu nombre"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     data-testid="input-contact-name"
                   />
                 </div>
@@ -642,14 +724,18 @@ function ContactSection() {
                   <Input
                     type="email"
                     placeholder="tu@email.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     data-testid="input-contact-email"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Teléfono</label>
+                  <label className="text-sm font-medium mb-2 block">Teléfono (opcional)</label>
                   <Input
                     type="tel"
                     placeholder="Tu teléfono"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     data-testid="input-contact-phone"
                   />
                 </div>
@@ -659,12 +745,20 @@ function ContactSection() {
                     placeholder="Tu mensaje..."
                     className="resize-none"
                     rows={4}
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     data-testid="textarea-contact-message"
                   />
                 </div>
-                <Button className="w-full" data-testid="button-send-message">
-                  Enviar mensaje
+                <Button className="w-full" disabled={isSubmitting} type="submit" data-testid="button-send-message">
+                  {isSubmitting ? "Enviando..." : "Enviar mensaje"}
                 </Button>
+                {submitStatus === "success" && (
+                  <p className="text-sm text-green-600 text-center">¡Mensaje enviado correctamente!</p>
+                )}
+                {submitStatus === "error" && (
+                  <p className="text-sm text-red-600 text-center">Por favor, completa todos los campos requeridos.</p>
+                )}
               </form>
               <p className="text-xs text-center text-muted-foreground">
                 O contáctanos directamente por{" "}
@@ -728,7 +822,7 @@ function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
           <div className="flex items-center justify-center md:justify-start gap-3">
-            <img src={logoImage} alt="Tropicolors Logo" className="h-12 w-auto rounded-md" data-testid="img-footer-logo" role="img" />
+            <img src={logoImage} alt="Tropicolors Logo" className="h-12 w-auto rounded-md" data-testid="img-footer-logo" />
           </div>
 
           <div className="text-center">
@@ -884,11 +978,7 @@ export default function Home() {
     if (element) {
       const offset = 80;
       const offsetPosition = element.offsetTop - offset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth",
-      });
+      window.scrollTo({ top: offsetPosition, behavior: "smooth" });
     }
   };
 
@@ -900,6 +990,8 @@ export default function Home() {
         <ProductsSection cart={cart} setCart={setCart} />
         <AboutSection />
         <BenefitsSection />
+        <TestimonialsSection />
+        <RecipesSection scrollToSection={scrollToSection} />
         <WhatsAppCTA />
         <ContactSection />
       </main>
