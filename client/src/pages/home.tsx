@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 import {
   Droplet,
   Sparkles,
@@ -24,10 +25,107 @@ import {
   ShoppingCart,
   Search,
   Star,
+  Zap,
+  Award,
+  Quote,
 } from "lucide-react";
 import { SiFacebook, SiWhatsapp } from "react-icons/si";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { motion, useInView, useScroll, useTransform } from "framer-motion";
 import logoImage from "@assets/logo-2021100510533067100_1764265250371.jpeg";
+
+const fadeInUp = {
+  hidden: { opacity: 0, y: 40 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+};
+
+const fadeInScale = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: "easeOut" } }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.2 } }
+};
+
+const staggerItem = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
+};
+
+function AnimatedSection({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  return (
+    <motion.div
+      ref={ref}
+      initial="hidden"
+      animate={isInView ? "visible" : "hidden"}
+      variants={fadeInUp}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function FloatingBlob({ className, delay = 0 }: { className: string; delay?: number }) {
+  return (
+    <motion.div
+      className={className}
+      animate={{
+        y: [0, -20, 0],
+        x: [0, 10, 0],
+        scale: [1, 1.05, 1],
+      }}
+      transition={{
+        duration: 8,
+        repeat: Infinity,
+        ease: "easeInOut",
+        delay,
+      }}
+    />
+  );
+}
+
+const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
+  id: i,
+  x: Math.floor(Math.random() * 100),
+  y: Math.floor(Math.random() * 100),
+  size: Math.floor(Math.random() * 6 + 2),
+  delay: Math.floor(Math.random() * 5),
+  duration: Math.floor(Math.random() * 10 + 10),
+}));
+
+function ParticleField() {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {PARTICLES.map((p) => (
+        <motion.div
+          key={p.id}
+          className="absolute rounded-full bg-gradient-to-br from-white/20 to-white/5"
+          style={{
+            left: `${p.x}%`,
+            top: `${p.y}%`,
+            width: p.size,
+            height: p.size,
+          }}
+          animate={{
+            y: [0, -100, 0],
+            opacity: [0, 0.8, 0],
+          }}
+          transition={{
+            duration: p.duration,
+            repeat: Infinity,
+            delay: p.delay,
+            ease: "easeInOut",
+          }}
+        />
+      ))}
+    </div>
+  );
+}
 
 const WHATSAPP_LINK = "https://wa.me/525551146856";
 
@@ -250,6 +348,10 @@ function Header({ scrollToSection, cartCount, onCartClick }: { scrollToSection: 
 }
 
 function Hero({ scrollToSection }: { scrollToSection: (id: string) => void }) {
+  const { scrollY } = useScroll();
+  const y = useTransform(scrollY, [0, 500], [0, 150]);
+  const opacity = useTransform(scrollY, [0, 300], [1, 0]);
+
   return (
     <section
       id="inicio"
@@ -257,60 +359,116 @@ function Hero({ scrollToSection }: { scrollToSection: (id: string) => void }) {
       data-testid="section-hero"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-muted/30" />
-      <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-br from-[hsl(var(--tropicolors-magenta))] to-transparent opacity-20 rounded-full blur-3xl motion-safe:animate-pulse" />
-      <div className="absolute top-40 right-20 w-96 h-96 bg-gradient-to-bl from-[hsl(var(--tropicolors-turquoise))] to-transparent opacity-15 rounded-full blur-3xl motion-safe:animate-pulse" style={{ animationDelay: "1s" }} />
-      <div className="absolute bottom-20 left-1/4 w-80 h-80 bg-gradient-to-tr from-[hsl(var(--tropicolors-yellow))] to-transparent opacity-15 rounded-full blur-3xl motion-safe:animate-pulse" style={{ animationDelay: "2s" }} />
-      <div className="absolute bottom-40 right-1/4 w-64 h-64 bg-gradient-to-tl from-[hsl(var(--tropicolors-blue))] to-transparent opacity-20 rounded-full blur-3xl motion-safe:animate-pulse" style={{ animationDelay: "0.5s" }} />
+      
+      <FloatingBlob 
+        className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-br from-[hsl(var(--tropicolors-magenta))] to-transparent opacity-30 rounded-full blur-3xl" 
+        delay={0} 
+      />
+      <FloatingBlob 
+        className="absolute top-40 right-20 w-96 h-96 bg-gradient-to-bl from-[hsl(var(--tropicolors-turquoise))] to-transparent opacity-25 rounded-full blur-3xl" 
+        delay={1} 
+      />
+      <FloatingBlob 
+        className="absolute bottom-20 left-1/4 w-80 h-80 bg-gradient-to-tr from-[hsl(var(--tropicolors-yellow))] to-transparent opacity-25 rounded-full blur-3xl" 
+        delay={2} 
+      />
+      <FloatingBlob 
+        className="absolute bottom-40 right-1/4 w-64 h-64 bg-gradient-to-tl from-[hsl(var(--tropicolors-blue))] to-transparent opacity-30 rounded-full blur-3xl" 
+        delay={0.5} 
+      />
+      <FloatingBlob 
+        className="absolute top-1/3 left-1/3 w-48 h-48 bg-gradient-to-br from-pink-500 to-transparent opacity-20 rounded-full blur-2xl" 
+        delay={3} 
+      />
+      
+      <ParticleField />
 
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <div className="space-y-8">
-          <Badge variant="outline" className="px-4 py-2 text-sm font-medium border-primary/30 bg-primary/5">
-            Colorantes Artificiales Premium
-          </Badge>
+      <motion.div 
+        className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
+        style={{ y, opacity }}
+      >
+        <motion.div 
+          className="space-y-8"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <Badge variant="outline" className="px-4 py-2 text-sm font-medium border-primary/30 bg-primary/5 backdrop-blur-sm">
+              Colorantes Artificiales Premium
+            </Badge>
+          </motion.div>
 
           <div className="space-y-6">
-            <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold text-foreground leading-tight">
-              <span className="bg-gradient-to-r from-[hsl(var(--tropicolors-blue))] via-[hsl(var(--tropicolors-turquoise))] to-[hsl(var(--tropicolors-magenta))] bg-clip-text text-transparent">
+            <motion.h1 
+              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-foreground leading-tight"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
+              <span className="bg-gradient-to-r from-[hsl(var(--tropicolors-blue))] via-[hsl(var(--tropicolors-turquoise))] to-[hsl(var(--tropicolors-magenta))] bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">
                 TROPICOLORS
               </span>
-            </h1>
-            <p className="text-xl sm:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Colorantes de alta calidad para alimentos y productos de limpieza. Colores vibrantes, máximo rendimiento y economía.
-            </p>
+            </motion.h1>
+            <motion.p 
+              className="text-xl sm:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
+              Colorantes de alta calidad para alimentos y productos de limpieza. 
+              <span className="text-foreground font-medium"> Colores vibrantes</span>, máximo rendimiento y economía.
+            </motion.p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+          <motion.div 
+            className="flex flex-col sm:flex-row gap-4 justify-center pt-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.7 }}
+          >
             <Button
               onClick={() => scrollToSection("productos")}
-              className="px-8 py-6 text-lg"
+              className="px-8 py-6 text-lg group relative overflow-hidden"
               size="lg"
               data-testid="button-explore-products"
             >
-              Explorar Productos
+              <span className="relative z-10 flex items-center gap-2">
+                <Sparkles className="w-5 h-5" />
+                Explorar Productos
+              </span>
             </Button>
             <Button
               onClick={() => window.open(`${WHATSAPP_LINK}?text=Hola%20quiero%20más%20información%20sobre%20sus%20productos`, "_blank")}
               variant="outline"
-              className="px-8 py-6 text-lg border-2"
+              className="px-8 py-6 text-lg border-2 group"
               size="lg"
               data-testid="button-contact-hero"
             >
-              <SiWhatsapp className="w-5 h-5 mr-2" />
+              <SiWhatsapp className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
               Contáctanos
             </Button>
-          </div>
-        </div>
-      </div>
+          </motion.div>
+        </motion.div>
+      </motion.div>
 
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 motion-safe:animate-bounce">
+      <motion.div 
+        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        animate={{ y: [0, 10, 0] }}
+        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+      >
         <button
           onClick={() => scrollToSection("productos")}
-          className="p-2 rounded-full bg-muted/50 hover:bg-muted transition-colors"
+          className="p-3 rounded-full bg-muted/50 hover:bg-muted transition-all hover:scale-110 backdrop-blur-sm border border-border/50"
           data-testid="button-scroll-down"
         >
           <ChevronDown className="w-6 h-6 text-muted-foreground" />
         </button>
-      </div>
+      </motion.div>
     </section>
   );
 }
@@ -327,6 +485,7 @@ function ProductsSection({ cart, setCart }: { cart: CartItem[]; setCart: (cart: 
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState(productSections[0].name);
   const [filteredProducts, setFilteredProducts] = useState(productSections[0].products);
+  const { toast } = useToast();
 
   useEffect(() => {
     const currentSection = productSections.find(s => s.name === activeCategory);
@@ -359,16 +518,31 @@ function ProductsSection({ cart, setCart }: { cart: CartItem[]; setCart: (cart: 
     }
     
     setQuantities(prev => ({ ...prev, [product.id]: 1 }));
+    
+    toast({
+      title: "Agregado al carrito",
+      description: `${product.name} x${quantity} agregado correctamente`,
+    });
   };
 
   const updateQuantity = (id: number, value: number) => {
     if (value > 0) setQuantities(prev => ({ ...prev, [id]: value }));
   };
 
+  const sectionRef = useRef(null);
+  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
+
   return (
-    <section id="productos" className="py-20 sm:py-28 bg-muted/30" data-testid="section-productos">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
+    <section id="productos" className="py-20 sm:py-28 bg-muted/30 relative overflow-hidden" data-testid="section-productos" ref={sectionRef}>
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent pointer-events-none" />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <motion.div 
+          className="text-center mb-12"
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6 }}
+        >
           <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm">Catálogo</Badge>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
             Nuestros <span className="text-primary">Productos</span>
@@ -377,9 +551,14 @@ function ProductsSection({ cart, setCart }: { cart: CartItem[]; setCart: (cart: 
             Selecciona una categoría para ver nuestros colorantes
           </p>
 
-          <div className="flex flex-wrap justify-center gap-3 mb-8">
-            {productSections.map((section) => (
-              <button
+          <motion.div 
+            className="flex flex-wrap justify-center gap-3 mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            {productSections.map((section, index) => (
+              <motion.button
                 key={section.name}
                 onClick={() => {
                   setActiveCategory(section.name);
@@ -388,15 +567,17 @@ function ProductsSection({ cart, setCart }: { cart: CartItem[]; setCart: (cart: 
                 className={`px-5 py-3 rounded-full font-medium text-sm transition-all duration-300 ${
                   activeCategory === section.name
                     ? `${categoryColors[section.name]} text-white shadow-lg scale-105`
-                    : "bg-card border border-border text-foreground hover:border-primary/50"
+                    : "bg-card border border-border text-foreground hover:border-primary/50 hover:shadow-md"
                 }`}
+                whileHover={{ scale: activeCategory === section.name ? 1.05 : 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 data-testid={`button-category-${section.name}`}
               >
                 {section.name}
                 <span className="ml-2 text-xs opacity-80">({section.products.length})</span>
-              </button>
+              </motion.button>
             ))}
-          </div>
+          </motion.div>
 
           <div className="relative max-w-md mx-auto">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -404,87 +585,112 @@ function ProductsSection({ cart, setCart }: { cart: CartItem[]; setCart: (cart: 
               placeholder="Buscar en esta categoría..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 h-11"
+              className="pl-12 h-11 shadow-sm"
               data-testid="input-product-search"
             />
           </div>
-        </div>
+        </motion.div>
 
-        <div className="mb-6">
+        <motion.div 
+          className="mb-6"
+          initial={{ opacity: 0, x: -20 }}
+          animate={isInView ? { opacity: 1, x: 0 } : {}}
+          transition={{ duration: 0.4, delay: 0.3 }}
+        >
           <h3 className={`text-2xl font-bold text-transparent bg-clip-text ${categoryColors[activeCategory]} inline-block`}>
             {activeCategory}
           </h3>
-        </div>
+        </motion.div>
 
         {filteredProducts.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground text-lg">No se encontraron productos que coincidan con tu búsqueda.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {filteredProducts.map((product) => (
-              <Card key={product.id} className="group overflow-visible hover-elevate transition-all duration-300 flex flex-col" data-testid={`card-product-${product.id}`}>
-                <div className={`h-48 bg-gradient-to-br ${product.gradient} relative overflow-hidden rounded-t-xl`}>
-                  <div className="absolute inset-0 bg-black/10" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center text-white">
-                      <Droplet className="w-16 h-16 mx-auto mb-2 opacity-90" />
-                      <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
-                        Colorante
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
+            variants={staggerContainer}
+            initial="hidden"
+            animate={isInView ? "visible" : "hidden"}
+          >
+            {filteredProducts.map((product, index) => (
+              <motion.div
+                key={product.id}
+                variants={staggerItem}
+                whileHover={{ y: -8, transition: { duration: 0.2 } }}
+              >
+                <Card className="group overflow-visible hover-elevate transition-all duration-300 flex flex-col h-full" data-testid={`card-product-${product.id}`}>
+                  <div className={`h-48 bg-gradient-to-br ${product.gradient} relative overflow-hidden rounded-t-xl`}>
+                    <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors" />
+                    <motion.div 
+                      className="absolute inset-0 flex items-center justify-center"
+                      whileHover={{ scale: 1.1 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className="text-center text-white">
+                        <Droplet className="w-16 h-16 mx-auto mb-2 opacity-90 drop-shadow-lg" />
+                        <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
+                          Colorante en Polvo
+                        </Badge>
+                      </div>
+                    </motion.div>
+                    <div className="absolute top-3 right-3">
+                      <Badge className="bg-black/30 text-white border-0 backdrop-blur-sm text-xs">
+                        Premium
                       </Badge>
                     </div>
                   </div>
-                </div>
-                <CardContent className="p-6 space-y-4 flex-1 flex flex-col">
-                  <div>
-                    <h4 className="text-lg font-semibold mb-2" data-testid={`text-product-name-${product.id}`}>{product.name}</h4>
-                    <p className="text-2xl font-bold text-primary">${product.price.toLocaleString('es-MX')}</p>
-                  </div>
-
-                  <div className="flex-1" />
-
-                  <div className="space-y-3 pt-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-muted-foreground">Cantidad:</span>
-                      <div className="flex items-center border border-border rounded-md">
-                        <button
-                          onClick={() => updateQuantity(product.id, (quantities[product.id] || 1) - 1)}
-                          className="p-1 hover:bg-muted"
-                          data-testid={`button-decrease-${product.id}`}
-                        >
-                          <Minus className="w-4 h-4" />
-                        </button>
-                        <input
-                          type="number"
-                          min="1"
-                          value={quantities[product.id] || 1}
-                          onChange={(e) => updateQuantity(product.id, parseInt(e.target.value) || 1)}
-                          className="w-12 text-center border-0 focus:ring-0 text-sm"
-                          data-testid={`input-quantity-${product.id}`}
-                        />
-                        <button
-                          onClick={() => updateQuantity(product.id, (quantities[product.id] || 1) + 1)}
-                          className="p-1 hover:bg-muted"
-                          data-testid={`button-increase-${product.id}`}
-                        >
-                          <Plus className="w-4 h-4" />
-                        </button>
-                      </div>
+                  <CardContent className="p-6 space-y-4 flex-1 flex flex-col">
+                    <div>
+                      <h4 className="text-lg font-semibold mb-2 line-clamp-2" data-testid={`text-product-name-${product.id}`}>{product.name}</h4>
+                      <p className="text-2xl font-bold text-primary">${product.price.toLocaleString('es-MX')}</p>
                     </div>
 
-                    <Button
-                      onClick={() => handleAddToCart(product)}
-                      className="w-full bg-[#25D366] hover:bg-[#20BD5A] text-white border-[#20BD5A] gap-1.5"
-                      data-testid={`button-add-to-cart-${product.id}`}
-                    >
-                      <ShoppingCart className="w-4 h-4" />
-                      Agregar al Carrito
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                    <div className="flex-1" />
+
+                    <div className="space-y-3 pt-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-muted-foreground">Cantidad:</span>
+                        <div className="flex items-center border border-border rounded-md bg-muted/30">
+                          <button
+                            onClick={() => updateQuantity(product.id, (quantities[product.id] || 1) - 1)}
+                            className="p-2 hover:bg-muted transition-colors"
+                            data-testid={`button-decrease-${product.id}`}
+                          >
+                            <Minus className="w-4 h-4" />
+                          </button>
+                          <input
+                            type="number"
+                            min="1"
+                            value={quantities[product.id] || 1}
+                            onChange={(e) => updateQuantity(product.id, parseInt(e.target.value) || 1)}
+                            className="w-12 text-center border-0 focus:ring-0 text-sm bg-transparent font-medium"
+                            data-testid={`input-quantity-${product.id}`}
+                          />
+                          <button
+                            onClick={() => updateQuantity(product.id, (quantities[product.id] || 1) + 1)}
+                            className="p-2 hover:bg-muted transition-colors"
+                            data-testid={`button-increase-${product.id}`}
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+
+                      <Button
+                        onClick={() => handleAddToCart(product)}
+                        className="w-full bg-[#25D366] hover:bg-[#20BD5A] text-white border-[#20BD5A] gap-1.5 group/btn"
+                        data-testid={`button-add-to-cart-${product.id}`}
+                      >
+                        <ShoppingCart className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
+                        Agregar al Carrito
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
     </section>
@@ -522,7 +728,7 @@ function AboutSection() {
                 <p className="text-sm text-muted-foreground mt-2">Clientes Satisfechos</p>
               </div>
               <div className="text-center sm:text-left">
-                <div className="text-3xl sm:text-4xl font-bold text-primary">15+</div>
+                <div className="text-3xl sm:text-4xl font-bold text-primary">37+</div>
                 <p className="text-sm text-muted-foreground mt-2">Productos</p>
               </div>
               <div className="text-center sm:text-left">
@@ -573,10 +779,20 @@ function AboutSection() {
 }
 
 function BenefitsSection() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+
   return (
-    <section id="beneficios" className="py-20 sm:py-28 bg-muted/30" data-testid="section-beneficios">
+    <section id="beneficios" className="py-20 sm:py-28 bg-muted/30 relative overflow-hidden" data-testid="section-beneficios" ref={ref}>
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[hsl(var(--tropicolors-blue))] via-[hsl(var(--tropicolors-turquoise))] to-[hsl(var(--tropicolors-magenta))]" />
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
+        <motion.div 
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6 }}
+        >
           <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm">Beneficios</Badge>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
             ¿Por qué elegir <span className="text-primary">Tropicolors</span>?
@@ -584,40 +800,65 @@ function BenefitsSection() {
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Descubre los beneficios que hacen de nuestros colorantes la opción perfecta
           </p>
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" data-testid="benefits-grid">
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          variants={staggerContainer}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          data-testid="benefits-grid"
+        >
           {benefits.map((benefit, index) => {
             const Icon = benefit.icon;
             return (
-              <Card
+              <motion.div
                 key={index}
-                className="hover-elevate transition-all duration-300"
-                data-testid={`card-benefit-${index}`}
+                variants={staggerItem}
+                whileHover={{ y: -5, transition: { duration: 0.2 } }}
               >
-                <CardContent className="p-6 space-y-4">
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Icon className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">{benefit.title}</h3>
-                    <p className="text-sm text-muted-foreground">{benefit.description}</p>
-                  </div>
-                </CardContent>
-              </Card>
+                <Card
+                  className="hover-elevate transition-all duration-300 h-full border-t-4 border-t-transparent hover:border-t-primary"
+                  data-testid={`card-benefit-${index}`}
+                >
+                  <CardContent className="p-6 space-y-4">
+                    <motion.div 
+                      className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center"
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <Icon className="w-7 h-7 text-primary" />
+                    </motion.div>
+                    <div>
+                      <h3 className="font-semibold text-lg mb-2">{benefit.title}</h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{benefit.description}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
 }
 
 function TestimonialsSection() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+
   return (
-    <section className="py-20 sm:py-28 bg-muted/30" data-testid="section-testimonials">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
+    <section className="py-20 sm:py-28 relative overflow-hidden" data-testid="section-testimonials" ref={ref}>
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-[hsl(var(--tropicolors-turquoise))]/5" />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <motion.div 
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6 }}
+        >
           <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm">Testimonios</Badge>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
             Lo que dicen nuestros <span className="text-primary">clientes</span>
@@ -625,35 +866,75 @@ function TestimonialsSection() {
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Conoce las experiencias de empresas que confían en Tropicolors
           </p>
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          {testimonials.map((testimonial) => (
-            <Card key={testimonial.id} className="hover-elevate" data-testid={`card-testimonial-${testimonial.id}`}>
-              <CardContent className="p-6 space-y-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-                      <span className="font-bold text-primary">{testimonial.image}</span>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold">{testimonial.name}</h4>
-                      <p className="text-sm text-muted-foreground">{testimonial.business}</p>
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
+          variants={staggerContainer}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+        >
+          {testimonials.map((testimonial, index) => (
+            <motion.div
+              key={testimonial.id}
+              variants={staggerItem}
+              whileHover={{ y: -5, transition: { duration: 0.2 } }}
+            >
+              <Card className="hover-elevate h-full relative overflow-hidden group" data-testid={`card-testimonial-${testimonial.id}`}>
+                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-primary/10 to-transparent rounded-bl-full" />
+                <CardContent className="p-6 space-y-4 relative">
+                  <Quote className="w-8 h-8 text-primary/20 absolute top-4 right-4" />
+                  
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-4">
+                      <motion.div 
+                        className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg"
+                        whileHover={{ scale: 1.1 }}
+                      >
+                        <span className="font-bold text-white text-lg">{testimonial.image}</span>
+                      </motion.div>
+                      <div>
+                        <h4 className="font-semibold text-lg">{testimonial.name}</h4>
+                        <p className="text-sm text-muted-foreground">{testimonial.business}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="flex gap-1">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-primary text-primary" />
-                  ))}
-                </div>
+                  <div className="flex gap-1">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={isInView ? { opacity: 1, scale: 1 } : {}}
+                        transition={{ delay: 0.5 + i * 0.1 }}
+                      >
+                        <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                      </motion.div>
+                    ))}
+                  </div>
 
-                <p className="text-muted-foreground text-sm leading-relaxed">"{testimonial.text}"</p>
-              </CardContent>
-            </Card>
+                  <p className="text-muted-foreground leading-relaxed italic">"{testimonial.text}"</p>
+                </CardContent>
+              </Card>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
+
+        <motion.div 
+          className="mt-12 flex justify-center gap-4 flex-wrap"
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : {}}
+          transition={{ delay: 0.8 }}
+        >
+          <Badge className="bg-primary/10 text-primary border-primary/20 px-4 py-2">
+            <Award className="w-4 h-4 mr-2" />
+            100+ Clientes Satisfechos
+          </Badge>
+          <Badge className="bg-[hsl(var(--tropicolors-turquoise))]/10 text-[hsl(var(--tropicolors-turquoise))] border-[hsl(var(--tropicolors-turquoise))]/20 px-4 py-2">
+            <Zap className="w-4 h-4 mr-2" />
+            Respuesta en 24h
+          </Badge>
+        </motion.div>
       </div>
     </section>
   );
@@ -661,26 +942,77 @@ function TestimonialsSection() {
 
 
 function WhatsAppCTA() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+
   return (
-    <section className="py-20 sm:py-28 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10" data-testid="section-whatsapp-cta">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm">Contacto Rápido</Badge>
+    <section className="py-20 sm:py-28 relative overflow-hidden" data-testid="section-whatsapp-cta" ref={ref}>
+      <div className="absolute inset-0 bg-gradient-to-r from-[#25D366]/10 via-[#25D366]/5 to-[#25D366]/10" />
+      <div className="absolute inset-0">
+        <div className="absolute top-10 left-10 w-32 h-32 bg-[#25D366]/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-10 right-10 w-40 h-40 bg-[#25D366]/15 rounded-full blur-3xl" />
+      </div>
+      
+      <motion.div 
+        className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative"
+        initial={{ opacity: 0, y: 30 }}
+        animate={isInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.6 }}
+      >
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={isInView ? { scale: 1 } : {}}
+          transition={{ duration: 0.5, type: "spring" }}
+          className="mb-6"
+        >
+          <div className="w-20 h-20 mx-auto bg-[#25D366] rounded-full flex items-center justify-center shadow-lg shadow-[#25D366]/30">
+            <SiWhatsapp className="w-10 h-10 text-white" />
+          </div>
+        </motion.div>
+
+        <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm border-[#25D366]/30 text-[#25D366]">Contacto Rápido</Badge>
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6">
-          ¿Tienes preguntas?
+          ¿Listo para <span className="text-[#25D366]">cotizar</span>?
         </h2>
         <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-          Contáctanos a través de WhatsApp para cotizaciones y más información sobre nuestros productos.
+          Envíanos un mensaje por WhatsApp y te responderemos en menos de 24 horas con tu cotización personalizada.
         </p>
-        <Button
-          onClick={() => window.open(`https://wa.me/525551146856?text=Hola%20Tropicolors%20me%20gustaría%20conocer%20más%20sobre%20sus%20productos`, "_blank")}
-          size="lg"
-          className="px-8 py-6 text-lg bg-[#25D366] hover:bg-[#20BD5A] text-white border-[#20BD5A] gap-2"
-          data-testid="button-whatsapp-cta"
+        
+        <motion.div 
+          className="flex flex-col sm:flex-row gap-4 justify-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: 0.3 }}
         >
-          <SiWhatsapp className="w-5 h-5" />
-          Abrir WhatsApp
-        </Button>
-      </div>
+          <Button
+            onClick={() => window.open(`https://wa.me/525551146856?text=Hola%20Tropicolors%20me%20gustaría%20conocer%20más%20sobre%20sus%20productos`, "_blank")}
+            size="lg"
+            className="px-8 py-6 text-lg bg-[#25D366] hover:bg-[#20BD5A] text-white border-[#20BD5A] gap-2 shadow-lg shadow-[#25D366]/20 group"
+            data-testid="button-whatsapp-cta"
+          >
+            <SiWhatsapp className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            Abrir WhatsApp
+          </Button>
+          <Button
+            onClick={() => window.open("tel:+525551146856", "_blank")}
+            size="lg"
+            variant="outline"
+            className="px-8 py-6 text-lg gap-2"
+          >
+            <Phone className="w-5 h-5" />
+            Llamar Ahora
+          </Button>
+        </motion.div>
+
+        <motion.p 
+          className="mt-6 text-sm text-muted-foreground"
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : {}}
+          transition={{ delay: 0.5 }}
+        >
+          +52 55 5114 6856 · Lunes a Viernes 9:00 - 18:00
+        </motion.p>
+      </motion.div>
     </section>
   );
 }
@@ -840,45 +1172,100 @@ function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-card border-t border-border py-12" data-testid="footer">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
-          <div className="flex items-center justify-center md:justify-start gap-3">
-            <img src={logoImage} alt="Tropicolors Logo" className="h-12 w-auto rounded-md" data-testid="img-footer-logo" />
+    <footer className="relative overflow-hidden" data-testid="footer">
+      <div className="absolute inset-0 bg-gradient-to-t from-primary/10 via-background to-background" />
+      <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-[hsl(var(--tropicolors-blue))] via-[hsl(var(--tropicolors-turquoise))] to-[hsl(var(--tropicolors-magenta))]" />
+      
+      <div className="relative py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 mb-12">
+            <div className="lg:col-span-2">
+              <div className="flex items-center gap-3 mb-4">
+                <img src={logoImage} alt="Tropicolors Logo" className="h-14 w-auto rounded-lg shadow-md" data-testid="img-footer-logo" />
+                <div>
+                  <h3 className="text-2xl font-bold bg-gradient-to-r from-[hsl(var(--tropicolors-blue))] to-[hsl(var(--tropicolors-turquoise))] bg-clip-text text-transparent">
+                    TROPICOLORS
+                  </h3>
+                  <p className="text-sm text-muted-foreground">Colorantes Artificiales Premium</p>
+                </div>
+              </div>
+              <p className="text-muted-foreground max-w-md mb-6">
+                Somos una microempresa mexicana especializada en colorantes artificiales de alta calidad para alimentos y productos de limpieza.
+              </p>
+              <div className="flex gap-3">
+                <motion.a
+                  href="https://wa.me/525551146856"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-12 h-12 rounded-xl bg-[#25D366]/10 flex items-center justify-center hover:bg-[#25D366] hover:text-white transition-all group"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  data-testid="link-footer-whatsapp"
+                >
+                  <SiWhatsapp className="w-5 h-5 text-[#25D366] group-hover:text-white transition-colors" />
+                </motion.a>
+                <motion.a
+                  href="mailto:tropicolors@hotmail.com"
+                  className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center hover:bg-primary hover:text-white transition-all group"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  data-testid="link-footer-email"
+                >
+                  <Mail className="w-5 h-5 text-primary group-hover:text-white transition-colors" />
+                </motion.a>
+                <motion.a
+                  href="https://www.facebook.com/colorantestropicolors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-12 h-12 rounded-xl bg-[#1877F2]/10 flex items-center justify-center hover:bg-[#1877F2] hover:text-white transition-all group"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  data-testid="link-footer-facebook"
+                >
+                  <SiFacebook className="w-5 h-5 text-[#1877F2] group-hover:text-white transition-colors" />
+                </motion.a>
+              </div>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold text-lg mb-4">Contacto</h4>
+              <ul className="space-y-3 text-muted-foreground">
+                <li className="flex items-center gap-2">
+                  <Phone className="w-4 h-4 text-primary" />
+                  +52 55 5114 6856
+                </li>
+                <li className="flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-primary" />
+                  tropicolors@hotmail.com
+                </li>
+                <li className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-primary" />
+                  Lun - Vie: 9:00 - 18:00
+                </li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold text-lg mb-4">Categorías</h4>
+              <ul className="space-y-2 text-muted-foreground">
+                {productSections.map((section) => (
+                  <li key={section.name}>
+                    <a href="#productos" className="hover:text-primary transition-colors">
+                      {section.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-
-          <div className="text-center">
+          
+          <div className="pt-8 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
             <p className="text-muted-foreground text-sm">
               © {currentYear} Tropicolors. Todos los derechos reservados.
             </p>
-          </div>
-
-          <div className="flex items-center justify-center md:justify-end gap-4">
-            <a
-              href="https://wa.me/525551146856"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-10 h-10 rounded-lg bg-[#25D366]/10 flex items-center justify-center hover:bg-[#25D366]/20 transition-colors"
-              data-testid="link-footer-whatsapp"
-            >
-              <SiWhatsapp className="w-5 h-5 text-[#25D366]" />
-            </a>
-            <a
-              href="mailto:tropicolors@hotmail.com"
-              className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
-              data-testid="link-footer-email"
-            >
-              <Mail className="w-5 h-5 text-primary" />
-            </a>
-            <a
-              href="https://www.facebook.com/colorantestropicolors"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-10 h-10 rounded-lg bg-[#1877F2]/10 flex items-center justify-center hover:bg-[#1877F2]/20 transition-colors"
-              data-testid="link-footer-facebook"
-            >
-              <SiFacebook className="w-5 h-5 text-[#1877F2]" />
-            </a>
+            <p className="text-muted-foreground text-sm">
+              Hecho con <span className="text-[hsl(var(--tropicolors-magenta))]">♥</span> en México
+            </p>
           </div>
         </div>
       </div>
