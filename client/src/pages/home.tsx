@@ -32,7 +32,7 @@ import {
 import { SiFacebook, SiWhatsapp } from "react-icons/si";
 import { useState, useEffect, useRef } from "react";
 import { motion, useInView, useScroll, useTransform } from "framer-motion";
-import logoImage from "@assets/logo-2021100510533067100_1764265250371.jpeg";
+import logoImage from "@assets/tropicolors-logo.png";
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 40 },
