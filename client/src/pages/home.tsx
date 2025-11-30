@@ -259,7 +259,7 @@ function Header({ scrollToSection, cartCount, onCartClick }: { scrollToSection: 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => scrollToSection("inicio")} data-testid="link-logo">
-            <img src={logoImage} alt="Tropicolors Logo" className="h-10 sm:h-12 w-auto rounded-md" />
+            <img src={logoImage} alt="Tropicolors Logo" className="h-20 sm:h-12 w-auto rounded-md" />
           </div>
 
           <nav className="hidden lg:flex items-center gap-1" data-testid="nav-desktop">
