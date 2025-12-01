@@ -3,7 +3,17 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
+import { stripePromise } from "@/lib/stripe";
+import {
+  Elements,
+  PaymentElement,
+  useElements,
+  useStripe,
+} from "@stripe/react-stripe-js";
 import {
   Droplet,
   Sparkles,
@@ -28,6 +38,12 @@ import {
   Zap,
   Award,
   Quote,
+  CreditCard,
+  Banknote,
+  Timer,
+  ShieldCheck,
+  Loader2,
+  CheckCircle,
 } from "lucide-react";
 import { SiFacebook, SiWhatsapp } from "react-icons/si";
 import { useState, useEffect, useRef } from "react";
@@ -235,6 +251,29 @@ const testimonials = [
 
 
 type CartItem = { id: number; name: string; price: number; quantity: number };
+type PaymentMethod = "card" | "transfer" | "whatsapp";
+
+type CheckoutCustomer = {
+  fullName: string;
+  email: string;
+  phone: string;
+  notes: string;
+  paymentMethod: PaymentMethod;
+};
+
+type CheckoutSessionResponse = {
+  clientSecret?: string;
+  orderId?: string;
+  message?: string;
+  success?: boolean;
+};
+
+const currencyFormatter = new Intl.NumberFormat("es-MX", {
+  style: "currency",
+  currency: "MXN",
+});
+
+const formatCurrency = (value: number) => currencyFormatter.format(value);
 
 function Header({ scrollToSection, cartCount, onCartClick }: { scrollToSection: (id: string) => void; cartCount: number; onCartClick: () => void }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -1277,7 +1316,19 @@ function Footer() {
   );
 }
 
-function CartModal({ isOpen, cart, setCart, onClose }: { isOpen: boolean; cart: CartItem[]; setCart: (cart: CartItem[]) => void; onClose: () => void }) {
+function CartModal({
+  isOpen,
+  cart,
+  setCart,
+  onClose,
+  onCheckout,
+}: {
+  isOpen: boolean;
+  cart: CartItem[];
+  setCart: (cart: CartItem[]) => void;
+  onClose: () => void;
+  onCheckout: () => void;
+}) {
   const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
   const handleRemoveItem = (id: number) => {
@@ -1292,7 +1343,7 @@ function CartModal({ isOpen, cart, setCart, onClose }: { isOpen: boolean; cart: 
     }
   };
 
-  const handleCheckout = () => {
+  const handleWhatsAppCheckout = () => {
     if (cart.length === 0) return;
     
     const cartText = cart
@@ -1365,10 +1416,18 @@ function CartModal({ isOpen, cart, setCart, onClose }: { isOpen: boolean; cart: 
           <div className="border-t p-6 space-y-4">
             <div className="flex items-center justify-between text-lg font-bold">
               <span>Total:</span>
-              <span>${total.toLocaleString('es-MX')}</span>
+              <span>{formatCurrency(total)}</span>
             </div>
             <Button
-              onClick={handleCheckout}
+              onClick={onCheckout}
+              className="w-full bg-primary hover:bg-primary/90 text-white py-6 text-lg gap-2"
+              data-testid="button-checkout-card"
+            >
+              <CreditCard className="w-5 h-5" />
+              Proceder al pago seguro
+            </Button>
+            <Button
+              onClick={handleWhatsAppCheckout}
               className="w-full bg-[#25D366] hover:bg-[#20BD5A] text-white border-[#20BD5A] py-6 text-lg gap-2"
               data-testid="button-checkout"
             >
