@@ -275,6 +275,46 @@ const currencyFormatter = new Intl.NumberFormat("es-MX", {
 
 const formatCurrency = (value: number) => currencyFormatter.format(value);
 
+const paymentMethodOptions: Array<{
+  id: PaymentMethod;
+  title: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+  helper?: string;
+  disabled?: boolean;
+}> = [
+  {
+    id: "card",
+    title: "Tarjeta de crédito o débito",
+    description: "Pagos seguros procesados por Stripe con tarjetas nacionales e internacionales.",
+    icon: CreditCard,
+  },
+  {
+    id: "transfer",
+    title: "Transferencia SPEI",
+    description: "Obtén los datos bancarios y confirma en automático (disponible pronto).",
+    icon: Banknote,
+    helper: "Próximamente",
+    disabled: true,
+  },
+  {
+    id: "whatsapp",
+    title: "Confirmar por WhatsApp",
+    description: "Envía la orden a un asesor para pactar el método de pago.",
+    icon: Timer,
+    helper: "Manual",
+    disabled: true,
+  },
+];
+
+const defaultCheckoutCustomer: CheckoutCustomer = {
+  fullName: "",
+  email: "",
+  phone: "",
+  notes: "",
+  paymentMethod: "card",
+};
+
 function Header({ scrollToSection, cartCount, onCartClick }: { scrollToSection: (id: string) => void; cartCount: number; onCartClick: () => void }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -1441,9 +1481,450 @@ function CartModal({
   );
 }
 
+function CheckoutModal({
+  isOpen,
+  onClose,
+  cart,
+  onPaymentCompleted,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  cart: CartItem[];
+  onPaymentCompleted: (payload: { paymentIntentId?: string; orderId?: string }) => void;
+}) {
+  const [step, setStep] = useState<"details" | "payment" | "success">("details");
+  const [checkoutData, setCheckoutData] = useState<CheckoutCustomer>(defaultCheckoutCustomer);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [orderId, setOrderId] = useState<string | null>(null);
+  const [isCreatingSession, setIsCreatingSession] = useState(false);
+  const [sessionError, setSessionError] = useState<string | null>(null);
+  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (!isOpen) {
+      setStep("details");
+      setCheckoutData(defaultCheckoutCustomer);
+      setClientSecret(null);
+      setOrderId(null);
+      setSessionError(null);
+      setIsCreatingSession(false);
+    }
+  }, [isOpen]);
+
+  const isDetailsValid =
+    checkoutData.fullName.trim().length > 2 &&
+    checkoutData.email.includes("@") &&
+    checkoutData.phone.trim().length >= 8 &&
+    cart.length > 0;
+
+  const handleCreateCheckoutSession = async () => {
+    if (!isDetailsValid) {
+      toast({
+        title: "Completa tus datos",
+        description: "Necesitamos tu nombre, correo y teléfono para continuar con el pago.",
+      });
+      return;
+    }
+
+    if (checkoutData.paymentMethod !== "card") {
+      setSessionError("Este método se habilitará muy pronto. Mientras tanto selecciona pago con tarjeta.");
+      return;
+    }
+
+    setIsCreatingSession(true);
+    setSessionError(null);
+    try {
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customer: {
+            name: checkoutData.fullName,
+            email: checkoutData.email,
+            phone: checkoutData.phone,
+            notes: checkoutData.notes,
+          },
+          items: cart,
+          paymentMethod: checkoutData.paymentMethod,
+        }),
+      });
+
+      if (!response.ok) {
+        const payload = (await response.json().catch(() => ({}))) as CheckoutSessionResponse;
+        throw new Error(payload.message || "No se pudo iniciar el proceso de pago.");
+      }
+
+      const data = (await response.json()) as CheckoutSessionResponse;
+      if (!data.clientSecret) {
+        throw new Error("El backend no devolvió el clientSecret de Stripe.");
+      }
+
+      setClientSecret(data.clientSecret);
+      setOrderId(data.orderId ?? null);
+      setStep("payment");
+    } catch (error) {
+      console.error("Error creando checkout:", error);
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error desconocido al iniciar el pago.";
+      setSessionError(message);
+      toast({
+        title: "No se pudo iniciar el pago",
+        description: message,
+      });
+    } finally {
+      setIsCreatingSession(false);
+    }
+  };
+
+  const handlePaymentApproved = (paymentIntentId?: string) => {
+    setStep("success");
+    onPaymentCompleted({ paymentIntentId, orderId: orderId ?? undefined });
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+      <Card className="w-full max-w-5xl max-h-[95vh] flex flex-col">
+        <div className="flex items-center justify-between p-6 border-b">
+          <div>
+            <p className="text-sm text-muted-foreground">Checkout seguro</p>
+            <h2 className="text-2xl font-bold">Confirma tu compra</h2>
+          </div>
+          <button onClick={onClose} className="p-2 rounded-md hover:bg-muted">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div className="grid lg:grid-cols-[2fr,1fr] gap-6 p-6 overflow-y-auto">
+          <div className="space-y-6">
+            {step === "details" && (
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-xl font-semibold mb-1">1. Tus datos</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Te notificaremos a este correo y teléfono cuando confirmemos tu pago.
+                  </p>
+                </div>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="checkout-name">Nombre completo</Label>
+                    <Input
+                      id="checkout-name"
+                      placeholder="Nombre y apellidos"
+                      value={checkoutData.fullName}
+                      onChange={(e) =>
+                        setCheckoutData({ ...checkoutData, fullName: e.target.value })
+                      }
+                      data-testid="input-checkout-name"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="checkout-email">Correo electrónico</Label>
+                    <Input
+                      id="checkout-email"
+                      placeholder="tucorreo@email.com"
+                      type="email"
+                      value={checkoutData.email}
+                      onChange={(e) =>
+                        setCheckoutData({ ...checkoutData, email: e.target.value })
+                      }
+                      data-testid="input-checkout-email"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="checkout-phone">Teléfono o WhatsApp</Label>
+                    <Input
+                      id="checkout-phone"
+                      placeholder="+52 55 0000 0000"
+                      value={checkoutData.phone}
+                      onChange={(e) =>
+                        setCheckoutData({ ...checkoutData, phone: e.target.value })
+                      }
+                      data-testid="input-checkout-phone"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="checkout-notes">Notas para nuestro equipo (opcional)</Label>
+                    <Textarea
+                      id="checkout-notes"
+                      placeholder="Indicaciones, horarios de entrega, etc."
+                      value={checkoutData.notes}
+                      onChange={(e) =>
+                        setCheckoutData({ ...checkoutData, notes: e.target.value })
+                      }
+                      rows={3}
+                      className="resize-none"
+                      data-testid="textarea-checkout-notes"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <h4 className="font-semibold">2. Elige método de pago</h4>
+                  <RadioGroup
+                    value={checkoutData.paymentMethod}
+                    onValueChange={(value) =>
+                      setCheckoutData({
+                        ...checkoutData,
+                        paymentMethod: value as PaymentMethod,
+                      })
+                    }
+                    className="grid gap-4"
+                  >
+                    {paymentMethodOptions.map((method) => {
+                      const Icon = method.icon;
+                      return (
+                        <label
+                          key={method.id}
+                          className={`flex flex-col gap-1 rounded-xl border p-4 cursor-pointer transition hover:border-primary ${
+                            checkoutData.paymentMethod === method.id
+                              ? "border-primary bg-primary/5"
+                              : "border-border"
+                          } ${method.disabled ? "opacity-60 cursor-not-allowed" : ""}`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <RadioGroupItem
+                              value={method.id}
+                              id={`method-${method.id}`}
+                              disabled={method.disabled}
+                            />
+                            <Icon className="w-5 h-5 text-primary" />
+                            <div>
+                              <p className="font-semibold">{method.title}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {method.description}
+                              </p>
+                            </div>
+                            {method.helper && (
+                              <Badge variant="secondary" className="ml-auto">
+                                {method.helper}
+                              </Badge>
+                            )}
+                          </div>
+                        </label>
+                      );
+                    })}
+                  </RadioGroup>
+                </div>
+
+                {sessionError && (
+                  <Alert variant="destructive">
+                    <AlertTitle>No pudimos iniciar el pago</AlertTitle>
+                    <AlertDescription>{sessionError}</AlertDescription>
+                  </Alert>
+                )}
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={onClose}
+                    data-testid="button-checkout-cancel"
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    className="flex-1"
+                    onClick={handleCreateCheckoutSession}
+                    disabled={isCreatingSession || !isDetailsValid}
+                    data-testid="button-checkout-continue"
+                  >
+                    {isCreatingSession && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                    Continuar al pago
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {step === "payment" && (
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-xl font-semibold mb-1">3. Pago con tarjeta</h3>
+                  <p className="text-sm text-muted-foreground flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-primary" />
+                    Tus datos se procesan con cifrado TLS directamente en Stripe.
+                  </p>
+                </div>
+                {stripePromise && clientSecret ? (
+                  <Elements
+                    stripe={stripePromise}
+                    options={{
+                      clientSecret,
+                      appearance: {
+                        labels: "floating",
+                        theme: "flat",
+                      },
+                    }}
+                  >
+                    <StripePaymentForm
+                      amount={total}
+                      onBack={() => setStep("details")}
+                      onSuccess={handlePaymentApproved}
+                    />
+                  </Elements>
+                ) : (
+                  <Alert>
+                    <AlertTitle>Configura tus llaves de Stripe</AlertTitle>
+                    <AlertDescription>
+                      Agrega <code>VITE_STRIPE_PUBLISHABLE_KEY</code> en el cliente y asegúrate de
+                      que <code>/api/checkout</code> devuelva un <code>clientSecret</code> válido
+                      para mostrar este formulario.
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </div>
+            )}
+
+            {step === "success" && (
+              <div className="space-y-4 text-center py-10">
+                <CheckCircle className="w-16 h-16 text-green-500 mx-auto" />
+                <div>
+                  <h3 className="text-2xl font-semibold">¡Pago en revisión!</h3>
+                  <p className="text-muted-foreground">
+                    Enviaremos la confirmación a <strong>{checkoutData.email}</strong> y
+                    notificaremos a tu WhatsApp {checkoutData.phone}.
+                  </p>
+                  {orderId && (
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Número de pedido provisional: <span className="font-semibold">{orderId}</span>
+                    </p>
+                  )}
+                </div>
+                <Button onClick={onClose} className="mx-auto mt-4">
+                  Cerrar
+                </Button>
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-4">
+            <Card>
+              <CardContent className="p-5 space-y-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Resumen de la orden</p>
+                  <h4 className="text-lg font-semibold">Productos ({cart.length})</h4>
+                </div>
+                <div className="space-y-3 max-h-60 overflow-y-auto pr-1">
+                  {cart.map((item) => (
+                    <div key={item.id} className="flex justify-between text-sm">
+                      <div>
+                        <p className="font-medium">{item.name}</p>
+                        <p className="text-muted-foreground">
+                          {item.quantity} x {formatCurrency(item.price)}
+                        </p>
+                      </div>
+                      <p className="font-semibold">
+                        {formatCurrency(item.price * item.quantity)}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                <div className="border-t pt-3 flex justify-between font-bold text-lg">
+                  <span>Total a pagar</span>
+                  <span>{formatCurrency(total)}</span>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-5 space-y-3">
+                <div className="flex items-center gap-2 text-sm">
+                  <ShieldCheck className="w-4 h-4 text-primary" />
+                  Pago 100% cifrado
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <Phone className="w-4 h-4 text-primary" />
+                  Soporte por WhatsApp
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <Mail className="w-4 h-4 text-primary" />
+                  Recibirás tu comprobante por correo
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function StripePaymentForm({
+  amount,
+  onSuccess,
+  onBack,
+}: {
+  amount: number;
+  onSuccess: (paymentIntentId?: string) => void;
+  onBack: () => void;
+}) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!stripe || !elements) return;
+
+    setIsProcessing(true);
+    setErrorMessage(null);
+
+    const result = await stripe.confirmPayment({
+      elements,
+      redirect: "if_required",
+      confirmParams: {
+        return_url: window.location.href,
+      },
+    });
+
+    if (result.error) {
+      setErrorMessage(result.error.message ?? "No se pudo procesar el pago.");
+      setIsProcessing(false);
+      return;
+    }
+
+    if (result.paymentIntent?.status === "succeeded") {
+      onSuccess(result.paymentIntent.id);
+    } else if (result.paymentIntent?.status === "processing") {
+      onSuccess(result.paymentIntent.id);
+    }
+
+    setIsProcessing(false);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="rounded-xl border p-4">
+        <PaymentElement options={{ layout: "tabs" }} />
+      </div>
+      {errorMessage && (
+        <Alert variant="destructive">
+          <AlertTitle>No pudimos completar el pago</AlertTitle>
+          <AlertDescription>{errorMessage}</AlertDescription>
+        </Alert>
+      )}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <Button type="button" variant="outline" className="flex-1" onClick={onBack}>
+          Regresar
+        </Button>
+        <Button type="submit" className="flex-1" disabled={!stripe || isProcessing}>
+          {isProcessing && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+          Pagar {formatCurrency(amount)}
+        </Button>
+      </div>
+    </form>
+  );
+}
+
 export default function Home() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [checkoutCart, setCheckoutCart] = useState<CartItem[]>([]);
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -1454,9 +1935,25 @@ export default function Home() {
     }
   };
 
+  const handleStartCheckout = () => {
+    if (cart.length === 0) return;
+    setCheckoutCart(cart);
+    setIsCartOpen(false);
+    setIsCheckoutOpen(true);
+  };
+
+  const handleCloseCheckout = () => {
+    setIsCheckoutOpen(false);
+    setCheckoutCart([]);
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      <Header scrollToSection={scrollToSection} cartCount={cart.reduce((sum, item) => sum + item.quantity, 0)} onCartClick={() => setIsCartOpen(true)} />
+      <Header
+        scrollToSection={scrollToSection}
+        cartCount={cart.reduce((sum, item) => sum + item.quantity, 0)}
+        onCartClick={() => setIsCartOpen(true)}
+      />
       <main>
         <Hero scrollToSection={scrollToSection} />
         <ProductsSection cart={cart} setCart={setCart} />
@@ -1467,7 +1964,21 @@ export default function Home() {
         <ContactSection />
       </main>
       <Footer />
-      <CartModal isOpen={isCartOpen} cart={cart} setCart={setCart} onClose={() => setIsCartOpen(false)} />
+      <CartModal
+        isOpen={isCartOpen}
+        cart={cart}
+        setCart={setCart}
+        onClose={() => setIsCartOpen(false)}
+        onCheckout={handleStartCheckout}
+      />
+      <CheckoutModal
+        isOpen={isCheckoutOpen}
+        onClose={handleCloseCheckout}
+        cart={checkoutCart}
+        onPaymentCompleted={() => {
+          setCart([]);
+        }}
+      />
     </div>
   );
 }
