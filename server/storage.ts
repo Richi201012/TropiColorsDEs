@@ -1,12 +1,15 @@
-import { 
-  type User, 
-  type InsertUser, 
-  type ContactMessage, 
+import {
+  type User,
+  type InsertUser,
+  type ContactMessage,
   type InsertContactMessage,
+  type Order,
+  type InsertOrder,
+  type OrderStatus,
   users,
-  contactMessages
+  contactMessages,
+  orders,
 } from "@shared/schema";
-import { randomUUID } from "crypto";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 
@@ -16,6 +19,13 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   createContactMessage(message: InsertContactMessage): Promise<ContactMessage>;
   getContactMessages(): Promise<ContactMessage[]>;
+  createOrder(order: InsertOrder): Promise<Order>;
+  updateOrderStatus(
+    paymentIntentId: string,
+    status: OrderStatus,
+    data?: Partial<InsertOrder>
+  ): Promise<Order | undefined>;
+  getOrderByPaymentIntentId(paymentIntentId: string): Promise<Order | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -41,6 +51,36 @@ export class DatabaseStorage implements IStorage {
 
   async getContactMessages(): Promise<ContactMessage[]> {
     return await db.select().from(contactMessages).orderBy(contactMessages.createdAt);
+  }
+
+  async createOrder(orderData: InsertOrder): Promise<Order> {
+    const [order] = await db.insert(orders).values(orderData).returning();
+    return order;
+  }
+
+  async updateOrderStatus(
+    paymentIntentId: string,
+    status: OrderStatus,
+    data?: Partial<InsertOrder>
+  ): Promise<Order | undefined> {
+    const [order] = await db
+      .update(orders)
+      .set({
+        status,
+        updatedAt: new Date(),
+        ...(data ?? {}),
+      })
+      .where(eq(orders.paymentIntentId, paymentIntentId))
+      .returning();
+    return order;
+  }
+
+  async getOrderByPaymentIntentId(paymentIntentId: string): Promise<Order | undefined> {
+    const [order] = await db
+      .select()
+      .from(orders)
+      .where(eq(orders.paymentIntentId, paymentIntentId));
+    return order;
   }
 }
 
