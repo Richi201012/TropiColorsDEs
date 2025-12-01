@@ -30,6 +30,26 @@ export type CheckoutResponse = {
   paymentIntentId: string;
 };
 
+type OrderNotificationPayload = {
+  orderNumber: string;
+  amount: number;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  paymentMethod?: string | null;
+  items?: OrderLineItem[] | null;
+  itemsSummary?: string | null;
+  notes?: string | null;
+};
+
+const METADATA_KEYS = {
+  itemsJson: "order_items_json",
+  itemsSummary: "order_items_summary",
+  notes: "order_notes",
+} as const;
+
+const MAX_METADATA_LENGTH = 450;
+
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -116,6 +136,142 @@ function formatCurrencyFromCents(value: number): string {
   return pesoFormatter.format(value / 100);
 }
 
+function clampMetadataValue(value: string): string {
+  return value.length > MAX_METADATA_LENGTH
+    ? value.slice(0, MAX_METADATA_LENGTH)
+    : value;
+}
+
+function buildItemsSummary(items: OrderLineItem[]): string {
+  if (!items.length) {
+    return "Sin productos registrados";
+  }
+
+  return clampMetadataValue(
+    items
+      .map(
+        (item) =>
+          `${item.name} x${item.quantity} (${pesoFormatter.format(
+            item.price * item.quantity,
+          )})`,
+      )
+      .join(" | "),
+  );
+}
+
+function serializeItemsForMetadata(items: OrderLineItem[]): {
+  json?: string;
+  summary: string;
+} {
+  let subset = [...items];
+  let serialized: string | undefined;
+
+  while (subset.length > 0) {
+    const candidate = JSON.stringify(subset);
+    if (candidate.length <= MAX_METADATA_LENGTH) {
+      serialized = candidate;
+      break;
+    }
+    subset = subset.slice(0, subset.length - 1);
+  }
+
+  return {
+    json: serialized,
+    summary: buildItemsSummary(items),
+  };
+}
+
+function parseItemsFromMetadata(value?: string | null): OrderLineItem[] | null {
+  if (!value) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(value);
+    if (!Array.isArray(parsed)) {
+      return null;
+    }
+
+    const normalized = parsed
+      .map((item) => ({
+        id: Number(item.id ?? Date.now()),
+        name: String(item.name ?? "").trim(),
+        price: Number(item.price ?? 0),
+        quantity: Number(item.quantity ?? 1),
+      }))
+      .filter(
+        (item) => item.name.length > 0 && item.price > 0 && item.quantity > 0,
+      );
+
+    return normalized.length ? normalized : null;
+  } catch (error) {
+    console.warn("No se pudo parsear order_items_json:", error);
+    return null;
+  }
+}
+
+function buildNotificationPayloadFromOrder(order: Order): OrderNotificationPayload {
+  return {
+    orderNumber: order.orderNumber,
+    amount: order.amount,
+    customerName: order.customerName,
+    customerEmail: order.customerEmail,
+    customerPhone: order.customerPhone,
+    paymentMethod: order.paymentMethod,
+    items: order.items,
+    notes: order.notes,
+  };
+}
+
+function buildOrderSnapshotFromPaymentIntent(
+  paymentIntent: Stripe.PaymentIntent,
+  receiptUrl?: string | null,
+): OrderNotificationPayload | undefined {
+  const metadata = paymentIntent.metadata ?? {};
+  const orderNumber = metadata.orderId ?? paymentIntent.id;
+  const customerName =
+    metadata.customerName ??
+    paymentIntent.shipping?.name ??
+    "Cliente Tropicolors";
+  const customerEmail =
+    metadata.customerEmail ?? paymentIntent.receipt_email ?? "";
+  const customerPhone =
+    metadata.customerPhone ??
+    paymentIntent.shipping?.phone ??
+    "Sin telefono";
+
+  if (!customerEmail) {
+    return undefined;
+  }
+
+  const items =
+    parseItemsFromMetadata(metadata[METADATA_KEYS.itemsJson]) ?? null;
+  const itemsSummary =
+    metadata[METADATA_KEYS.itemsSummary] ??
+    (items && items.length ? buildItemsSummary(items) : null);
+
+  return {
+    orderNumber,
+    amount:
+      typeof paymentIntent.amount_received === "number" &&
+      paymentIntent.amount_received > 0
+        ? paymentIntent.amount_received
+        : paymentIntent.amount ?? 0,
+    customerName,
+    customerEmail,
+    customerPhone,
+    paymentMethod:
+      paymentIntent.payment_method_types?.[0] ??
+      (typeof paymentIntent.payment_method === "object"
+        ? (paymentIntent.payment_method as any)?.type
+        : undefined) ??
+      "card",
+    items,
+    itemsSummary,
+    notes: metadata[METADATA_KEYS.notes] ?? null,
+  };
+}
+
 export async function createCheckoutSession(
   payload: CheckoutPayload,
 ): Promise<CheckoutResponse> {
@@ -152,6 +308,19 @@ export async function createCheckoutSession(
     customerPhone,
   };
 
+  const itemsMetadata = serializeItemsForMetadata(items);
+  if (itemsMetadata.json) {
+    metadata[METADATA_KEYS.itemsJson] = itemsMetadata.json;
+  }
+  if (itemsMetadata.summary) {
+    metadata[METADATA_KEYS.itemsSummary] = itemsMetadata.summary;
+  }
+  if (payload.customer?.notes) {
+    metadata[METADATA_KEYS.notes] = clampMetadataValue(
+      payload.customer.notes,
+    );
+  }
+
   const paymentIntent = await stripeClient!.paymentIntents.create({
     amount: amountCents,
     currency: "mxn",
@@ -167,21 +336,25 @@ export async function createCheckoutSession(
     );
   }
 
-  await storage.createOrder({
-    orderNumber: orderId,
-    paymentIntentId: paymentIntent.id,
-    status: "pending",
-    amount: amountCents,
-    currency: "mxn",
-    paymentMethod: payload.paymentMethod ?? "card",
-    customerName,
-    customerEmail,
-    customerPhone,
-    notes: payload.customer?.notes,
-    items,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  });
+  try {
+    await storage.createOrder({
+      orderNumber: orderId,
+      paymentIntentId: paymentIntent.id,
+      status: "pending",
+      amount: amountCents,
+      currency: "mxn",
+      paymentMethod: payload.paymentMethod ?? "card",
+      customerName,
+      customerEmail,
+      customerPhone,
+      notes: payload.customer?.notes,
+      items,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+  } catch (error) {
+    console.error("No se pudo guardar la orden en la base de datos:", error);
+  }
 
   return {
     clientSecret: paymentIntent.client_secret,
@@ -231,38 +404,78 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<void> {
 async function handlePaymentIntentSucceeded(
   paymentIntent: Stripe.PaymentIntent,
 ) {
-  const order = await storage.getOrderByPaymentIntentId(paymentIntent.id);
-  if (!order) {
-    console.warn(
-      `No se encontro la orden para el PaymentIntent ${paymentIntent.id}`,
-    );
-    return;
+  let order: Order | undefined;
+  try {
+    order = await storage.getOrderByPaymentIntentId(paymentIntent.id);
+  } catch (error) {
+    console.error("No se pudo obtener la orden desde la base de datos:", error);
   }
 
   const receiptUrl = await fetchReceiptUrl(paymentIntent);
 
-  const updatedOrder =
-    (await storage.updateOrderStatus(paymentIntent.id, "paid", {
-      receiptUrl: receiptUrl ?? order.receiptUrl,
-    })) ?? order;
+  let notificationPayload: OrderNotificationPayload | undefined;
 
-  await Promise.all([
-    sendWhatsAppNotification(updatedOrder, receiptUrl ?? undefined),
-    sendOrderEmails(updatedOrder, "paid", receiptUrl ?? undefined),
-  ]);
-}
+  if (order) {
+    let updatedOrder = order;
+    try {
+      updatedOrder =
+        (await storage.updateOrderStatus(paymentIntent.id, "paid", {
+          receiptUrl: receiptUrl ?? order.receiptUrl,
+        })) ?? order;
+    } catch (error) {
+      console.error("No se pudo actualizar el estado de la orden:", error);
+    }
 
-async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentIntent) {
-  const order = await storage.getOrderByPaymentIntentId(paymentIntent.id);
-  if (!order) {
+    notificationPayload = buildNotificationPayloadFromOrder(updatedOrder);
+  } else {
     console.warn(
-      `Intento fallido pero sin orden guardada: ${paymentIntent.id}`,
+      `No se encontro la orden para el PaymentIntent ${paymentIntent.id}. Se usaran los metadatos para notificar.`,
+    );
+    notificationPayload = buildOrderSnapshotFromPaymentIntent(
+      paymentIntent,
+      receiptUrl,
+    );
+  }
+
+  if (!notificationPayload) {
+    console.warn(
+      `No se pudo reconstruir la orden del PaymentIntent ${paymentIntent.id}`,
     );
     return;
   }
 
-  await storage.updateOrderStatus(paymentIntent.id, "failed");
-  await sendOrderEmails(order, "failed");
+  await Promise.all([
+    sendWhatsAppNotification(notificationPayload, receiptUrl ?? undefined),
+    sendOrderEmails(notificationPayload, "paid", receiptUrl ?? undefined),
+  ]);
+}
+
+async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentIntent) {
+  let order: Order | undefined;
+  try {
+    order = await storage.getOrderByPaymentIntentId(paymentIntent.id);
+  } catch (error) {
+    console.error("No se pudo obtener la orden fallida:", error);
+  }
+
+  if (order) {
+    try {
+      await storage.updateOrderStatus(paymentIntent.id, "failed");
+    } catch (error) {
+      console.error("No se pudo marcar la orden como fallida:", error);
+    }
+    await sendOrderEmails(order, "failed");
+    return;
+  }
+
+  const snapshot = buildOrderSnapshotFromPaymentIntent(paymentIntent);
+  if (snapshot) {
+    await sendOrderEmails(snapshot, "failed");
+  } else {
+    console.warn(
+      `Intento fallido pero sin informacion suficiente del PaymentIntent ${paymentIntent.id}`,
+    );
+  }
 }
 
 async function fetchReceiptUrl(
@@ -289,23 +502,30 @@ async function fetchReceiptUrl(
   return null;
 }
 
-function buildItemsList(items: OrderLineItem[] | null | undefined): string {
-  if (!items || items.length === 0) {
-    return "Sin productos registrados";
+function buildItemsList(
+  items: OrderLineItem[] | null | undefined,
+  fallbackSummary?: string | null,
+): string {
+  if (items && items.length > 0) {
+    return items
+      .map(
+        (item) =>
+          `- ${item.name} x${item.quantity} - ${pesoFormatter.format(
+            item.price * item.quantity,
+          )}`,
+      )
+      .join("\n");
   }
 
-  return items
-    .map(
-      (item) =>
-        `- ${item.name} x${item.quantity} - ${pesoFormatter.format(
-          item.price * item.quantity,
-        )}`,
-    )
-    .join("\n");
+  if (fallbackSummary && fallbackSummary.length > 0) {
+    return fallbackSummary;
+  }
+
+  return "Sin productos registrados";
 }
 
 async function sendWhatsAppNotification(
-  order: Order,
+  order: OrderNotificationPayload,
   receiptUrl?: string,
 ): Promise<void> {
   if (
@@ -331,7 +551,7 @@ async function sendWhatsAppNotification(
     `Total: ${formatCurrencyFromCents(order.amount)}`,
     `Cliente: ${order.customerName} (${order.customerPhone})`,
     `Correo: ${order.customerEmail}`,
-    `Productos:\n${buildItemsList(order.items)}`,
+    `Productos:\n${buildItemsList(order.items, order.itemsSummary)}`,
     receiptUrl ? `Recibo: ${receiptUrl}` : undefined,
   ]
     .filter(Boolean)
@@ -345,7 +565,7 @@ async function sendWhatsAppNotification(
 }
 
 async function sendOrderEmails(
-  order: Order,
+  order: OrderNotificationPayload,
   status: OrderStatus,
   receiptUrl?: string,
 ): Promise<void> {
@@ -363,7 +583,7 @@ async function sendOrderEmails(
     `Telefono: ${order.customerPhone}`,
     `Correo: ${order.customerEmail}`,
     `Productos:`,
-    buildItemsList(order.items),
+    buildItemsList(order.items, order.itemsSummary),
     order.notes ? `Notas: ${order.notes}` : undefined,
     receiptUrl ? `Recibo Stripe: ${receiptUrl}` : undefined,
   ]
@@ -391,7 +611,7 @@ async function sendOrderEmails(
       "Estamos procesando tu pedido y en breve nos pondremos en contacto contigo.",
       "",
       `Resumen:`,
-      buildItemsList(order.items),
+      buildItemsList(order.items, order.itemsSummary),
       `Total pagado: ${formatCurrencyFromCents(order.amount)}`,
       receiptUrl ? `Comprobante: ${receiptUrl}` : undefined,
       "",
