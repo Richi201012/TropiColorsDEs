@@ -9,7 +9,7 @@ import {
   users,
   contactMessages,
   orders,
-} from "@shared/schema";
+} from "../shared/schema.js";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 
