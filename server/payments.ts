@@ -1,7 +1,7 @@
 import Stripe from "stripe";
 import twilio from "twilio";
 import nodemailer from "nodemailer";
-import { storage } from "./storage";
+import { storage } from "./storage.js";
 import type { Order, OrderLineItem, OrderStatus } from "@shared/schema";
 
 type CheckoutItemInput = {
