@@ -7,7 +7,7 @@ import {
   constructStripeEvent,
   handleStripeEvent,
   ensureStripeWebhookConfigured,
-} from "./payments";
+} from "./payments.js";
 
 export async function registerRoutes(
   httpServer: Server,

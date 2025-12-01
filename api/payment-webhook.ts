@@ -3,7 +3,7 @@ import {
   constructStripeEvent,
   ensureStripeWebhookConfigured,
   handleStripeEvent,
-} from "../server/payments";
+} from "../server/payments.js";
 
 export const config = {
   api: {
