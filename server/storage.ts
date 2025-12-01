@@ -13,6 +13,15 @@ import {
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 
+function assertDb() {
+  if (!db) {
+    throw new Error(
+      "La base de datos no esta configurada. Define DATABASE_URL para habilitar el almacenamiento.",
+    );
+  }
+  return db;
+}
+
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
@@ -30,31 +39,46 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   async getUser(id: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
+    const database = assertDb();
+    const [user] = await database.select().from(users).where(eq(users.id, id));
     return user;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
+    const database = assertDb();
+    const [user] = await database
+      .select()
+      .from(users)
+      .where(eq(users.username, username));
     return user;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db.insert(users).values(insertUser).returning();
+    const database = assertDb();
+    const [user] = await database.insert(users).values(insertUser).returning();
     return user;
   }
 
   async createContactMessage(message: InsertContactMessage): Promise<ContactMessage> {
-    const [contactMessage] = await db.insert(contactMessages).values(message).returning();
+    const database = assertDb();
+    const [contactMessage] = await database
+      .insert(contactMessages)
+      .values(message)
+      .returning();
     return contactMessage;
   }
 
   async getContactMessages(): Promise<ContactMessage[]> {
-    return await db.select().from(contactMessages).orderBy(contactMessages.createdAt);
+    const database = assertDb();
+    return await database
+      .select()
+      .from(contactMessages)
+      .orderBy(contactMessages.createdAt);
   }
 
   async createOrder(orderData: InsertOrder): Promise<Order> {
-    const [order] = await db.insert(orders).values(orderData).returning();
+    const database = assertDb();
+    const [order] = await database.insert(orders).values(orderData).returning();
     return order;
   }
 
@@ -63,7 +87,8 @@ export class DatabaseStorage implements IStorage {
     status: OrderStatus,
     data?: Partial<InsertOrder>
   ): Promise<Order | undefined> {
-    const [order] = await db
+    const database = assertDb();
+    const [order] = await database
       .update(orders)
       .set({
         status,
@@ -76,7 +101,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getOrderByPaymentIntentId(paymentIntentId: string): Promise<Order | undefined> {
-    const [order] = await db
+    const database = assertDb();
+    const [order] = await database
       .select()
       .from(orders)
       .where(eq(orders.paymentIntentId, paymentIntentId));
