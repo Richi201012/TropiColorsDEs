@@ -10,7 +10,7 @@ import {
   contactMessages,
   orders,
 } from "../shared/schema.js";
-import { db } from "./db";
+import { db } from "./db.js";
 import { eq } from "drizzle-orm";
 
 function assertDb() {
