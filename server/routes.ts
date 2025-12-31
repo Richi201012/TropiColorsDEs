@@ -1,12 +1,58 @@
-import type { Express } from "express";
+import type { Express, Request } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertContactMessageSchema } from "@shared/schema";
+import { insertContactMessageSchema } from "../shared/schema.js";
+import {
+  createCheckoutSession,
+  constructStripeEvent,
+  handleStripeEvent,
+  ensureStripeWebhookConfigured,
+} from "./payments.js";
 
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+  app.post("/api/checkout", async (req, res) => {
+    try {
+      const result = await createCheckoutSession(req.body);
+      res.status(201).json({
+        success: true,
+        ...result,
+      });
+    } catch (error) {
+      console.error("Error creando checkout:", error);
+      res.status(400).json({
+        success: false,
+        message:
+          error instanceof Error
+            ? error.message
+            : "No se pudo iniciar el pago.",
+      });
+    }
+  });
+
+  app.post("/api/payment-webhook", async (req: Request, res) => {
+    try {
+      ensureStripeWebhookConfigured();
+      const rawBody = (req as Request & { rawBody?: Buffer }).rawBody;
+      if (!rawBody) {
+        throw new Error("No pudimos leer el cuerpo del webhook.");
+      }
+
+      const event = constructStripeEvent(rawBody, req.headers["stripe-signature"]);
+      await handleStripeEvent(event);
+      res.status(200).json({ received: true });
+    } catch (error) {
+      console.error("Stripe webhook error:", error);
+      const message =
+        error instanceof Error
+          ? error.message
+          : "No se pudo procesar el webhook.";
+      res.status(400).json({ success: false, message });
+    }
+  });
+
   app.post("/api/contact", async (req, res) => {
     try {
       const validatedData = insertContactMessageSchema.parse(req.body);
