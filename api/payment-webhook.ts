@@ -11,6 +11,9 @@ export const config = {
   },
 };
 
+// Webhook endpoints don't need CORS as they're called by Stripe servers
+// But we add a simple response for health checks
+
 async function readBuffer(req: VercelRequest): Promise<Buffer> {
   const chunks: Buffer[] = [];
   for await (const chunk of req as any as AsyncIterable<Buffer | string>) {
