@@ -44,6 +44,7 @@ import {
   ShieldCheck,
   Loader2,
   CheckCircle,
+  MapPin,
 } from "lucide-react";
 import { SiFacebook, SiWhatsapp } from "react-icons/si";
 import { useState, useEffect, useRef } from "react";
@@ -257,8 +258,18 @@ type CheckoutCustomer = {
   fullName: string;
   email: string;
   phone: string;
+  rfc: string; // RFC para factura
   notes: string;
   paymentMethod: PaymentMethod;
+};
+
+type ShippingData = {
+  street: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  deliveryInstructions: string;
 };
 
 type CheckoutSessionResponse = {
@@ -311,8 +322,18 @@ const defaultCheckoutCustomer: CheckoutCustomer = {
   fullName: "",
   email: "",
   phone: "",
+  rfc: "",
   notes: "",
   paymentMethod: "card",
+};
+
+const defaultShippingData: ShippingData = {
+  street: "",
+  city: "",
+  state: "",
+  postalCode: "",
+  country: "México",
+  deliveryInstructions: "",
 };
 
 function Header({ scrollToSection, cartCount, onCartClick }: { scrollToSection: (id: string) => void; cartCount: number; onCartClick: () => void }) {
@@ -1492,8 +1513,9 @@ function CheckoutModal({
   cart: CartItem[];
   onPaymentCompleted: (payload: { paymentIntentId?: string; orderId?: string }) => void;
 }) {
-  const [step, setStep] = useState<"details" | "payment" | "success">("details");
+  const [step, setStep] = useState<"details" | "shipping" | "payment" | "success">("details");
   const [checkoutData, setCheckoutData] = useState<CheckoutCustomer>(defaultCheckoutCustomer);
+  const [shippingData, setShippingData] = useState<ShippingData>(defaultShippingData);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [orderId, setOrderId] = useState<string | null>(null);
   const [isCreatingSession, setIsCreatingSession] = useState(false);
@@ -1505,6 +1527,7 @@ function CheckoutModal({
     if (!isOpen) {
       setStep("details");
       setCheckoutData(defaultCheckoutCustomer);
+      setShippingData(defaultShippingData);
       setClientSecret(null);
       setOrderId(null);
       setSessionError(null);
@@ -1517,6 +1540,12 @@ function CheckoutModal({
     checkoutData.email.includes("@") &&
     checkoutData.phone.trim().length >= 8 &&
     cart.length > 0;
+
+  const isShippingValid =
+    shippingData.street.trim().length > 0 &&
+    shippingData.city.trim().length > 0 &&
+    shippingData.state.trim().length > 0 &&
+    shippingData.postalCode.trim().length >= 4;
 
   const handleCreateCheckoutSession = async () => {
     if (!isDetailsValid) {
@@ -1543,8 +1572,10 @@ function CheckoutModal({
             name: checkoutData.fullName,
             email: checkoutData.email,
             phone: checkoutData.phone,
+            rfc: checkoutData.rfc,
             notes: checkoutData.notes,
           },
+          shipping: shippingData,
           items: cart,
           paymentMethod: checkoutData.paymentMethod,
         }),
@@ -1648,6 +1679,19 @@ function CheckoutModal({
                     />
                   </div>
                   <div>
+                    <Label htmlFor="checkout-rfc">RFC (para factura)</Label>
+                    <Input
+                      id="checkout-rfc"
+                      placeholder="XAXX010101000"
+                      value={checkoutData.rfc}
+                      onChange={(e) =>
+                        setCheckoutData({ ...checkoutData, rfc: e.target.value.toUpperCase() })
+                      }
+                      data-testid="input-checkout-rfc"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">Opcional - Required para factura</p>
+                  </div>
+                  <div>
                     <Label htmlFor="checkout-notes">Notas para nuestro equipo (opcional)</Label>
                     <Textarea
                       id="checkout-notes"
@@ -1729,9 +1773,122 @@ function CheckoutModal({
                   </Button>
                   <Button
                     className="flex-1"
-                    onClick={handleCreateCheckoutSession}
-                    disabled={isCreatingSession || !isDetailsValid}
+                    onClick={() => setStep("shipping")}
+                    disabled={!isDetailsValid}
                     data-testid="button-checkout-continue"
+                  >
+                    Continuar a envío
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {step === "shipping" && (
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-xl font-semibold mb-1">2. Datos de envío</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Indica la dirección donde deseas recibir tu pedido.
+                  </p>
+                </div>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="sm:col-span-2">
+                    <Label htmlFor="shipping-street">Calle y número</Label>
+                    <Input
+                      id="shipping-street"
+                      placeholder="Av. Principal #123"
+                      value={shippingData.street}
+                      onChange={(e) =>
+                        setShippingData({ ...shippingData, street: e.target.value })
+                      }
+                      data-testid="input-shipping-street"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="shipping-city">Ciudad</Label>
+                    <Input
+                      id="shipping-city"
+                      placeholder="Ciudad de México"
+                      value={shippingData.city}
+                      onChange={(e) =>
+                        setShippingData({ ...shippingData, city: e.target.value })
+                      }
+                      data-testid="input-shipping-city"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="shipping-state">Estado</Label>
+                    <Input
+                      id="shipping-state"
+                      placeholder="CDMX"
+                      value={shippingData.state}
+                      onChange={(e) =>
+                        setShippingData({ ...shippingData, state: e.target.value })
+                      }
+                      data-testid="input-shipping-state"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="shipping-postalCode">Código postal</Label>
+                    <Input
+                      id="shipping-postalCode"
+                      placeholder="01000"
+                      value={shippingData.postalCode}
+                      onChange={(e) =>
+                        setShippingData({ ...shippingData, postalCode: e.target.value })
+                      }
+                      data-testid="input-shipping-postalCode"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="shipping-country">País</Label>
+                    <Input
+                      id="shipping-country"
+                      placeholder="México"
+                      value={shippingData.country}
+                      onChange={(e) =>
+                        setShippingData({ ...shippingData, country: e.target.value })
+                      }
+                      data-testid="input-shipping-country"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <Label htmlFor="shipping-instructions">Instrucciones de entrega (opcional)</Label>
+                    <Textarea
+                      id="shipping-instructions"
+                      placeholder="Referencias, horarios"
+                      value={shippingData.deliveryInstructions}
+                      onChange={(e) =>
+                        setShippingData({ ...shippingData, deliveryInstructions: e.target.value })
+                      }
+                      rows={3}
+                      className="resize-none"
+                      data-testid="textarea-shipping-instructions"
+                    />
+                  </div>
+                </div>
+
+                {sessionError && (
+                  <Alert variant="destructive">
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>{sessionError}</AlertDescription>
+                  </Alert>
+                )}
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => setStep("details")}
+                    data-testid="button-shipping-back"
+                  >
+                    Regresar
+                  </Button>
+                  <Button
+                    className="flex-1"
+                    onClick={handleCreateCheckoutSession}
+                    disabled={isCreatingSession || !isShippingValid}
+                    data-testid="button-shipping-continue"
                   >
                     {isCreatingSession && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                     Continuar al pago
@@ -1743,7 +1900,7 @@ function CheckoutModal({
             {step === "payment" && (
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-xl font-semibold mb-1">3. Pago con tarjeta</h3>
+                  <h3 className="text-xl font-semibold mb-1">4. Pago con tarjeta</h3>
                   <p className="text-sm text-muted-foreground flex items-center gap-2">
                     <ShieldCheck className="w-4 h-4 text-primary" />
                     Tus datos se procesan con cifrado TLS directamente en Stripe.
@@ -1762,7 +1919,7 @@ function CheckoutModal({
                   >
                     <StripePaymentForm
                       amount={total}
-                      onBack={() => setStep("details")}
+                      onBack={() => setStep("shipping")}
                       onSuccess={handlePaymentApproved}
                     />
                   </Elements>
