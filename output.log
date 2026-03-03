@@ -1,0 +1,10 @@
+
+> rest-express@1.0.0 dev
+> tsx server/index.ts
+
+[Firebase] Firebase Admin initialized successfully
+[Email] Transport configured successfully
+[Email] Host: smtp-relay.brevo.com
+[Email] Port: 587
+[Email] From: noreply@tropicolors.mx
+Re-optimizing dependencies because vite config has changed

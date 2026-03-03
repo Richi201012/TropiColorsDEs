@@ -11,7 +11,7 @@ import {
   orders,
 } from "../shared/schema.js";
 import { db } from "./db.js";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 
 function assertDb() {
   if (!db) {
@@ -35,6 +35,7 @@ export interface IStorage {
     data?: Partial<InsertOrder>
   ): Promise<Order | undefined>;
   getOrderByPaymentIntentId(paymentIntentId: string): Promise<Order | undefined>;
+  getAllOrders(): Promise<Order[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -107,6 +108,14 @@ export class DatabaseStorage implements IStorage {
       .from(orders)
       .where(eq(orders.paymentIntentId, paymentIntentId));
     return order;
+  }
+
+  async getAllOrders(): Promise<Order[]> {
+    const database = assertDb();
+    return await database
+      .select()
+      .from(orders)
+      .orderBy(desc(orders.createdAt));
   }
 }
 

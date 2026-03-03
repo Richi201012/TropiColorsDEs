@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación de tu pedido - Tropicolors</title>
+    <style>
+        /* Reset styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+        }
+        table {
+            border-collapse: collapse;
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+        img {
+            border: 0;
+            outline: none;
+            text-decoration: none;
+            -ms-interpolation-mode: bicubic;
+        }
+        /* Main container */
+        .email-wrapper {
+            width: 100%;
+            background-color: #f5f5f5;
+            padding: 30px 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        /* Header */
+        .email-header {
+            background: linear-gradient(135deg, #003F91 0%, #0056b3 100%);
+            padding: 25px 20px;
+            text-align: center;
+        }
+        .logo-container {
+            background-color: #ffffff;
+            display: inline-block;
+            padding: 12px 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+            margin-bottom: 10px;
+        }
+        .logo {
+            height: 50px;
+            display: block;
+        }
+        .logo-text {
+            font-size: 22px;
+            font-weight: bold;
+            color: #003F91;
+            text-decoration: none;
+            display: block;
+            margin-top: 5px;
+        }
+        /* Content */
+        .email-content {
+            padding: 35px 25px;
+        }
+        .title {
+            font-size: 26px;
+            font-weight: bold;
+            color: #003F91;
+            margin: 0 0 12px 0;
+            text-align: center;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #666666;
+            margin: 0 0 30px 0;
+            text-align: center;
+            line-height: 1.5;
+        }
+        /* Order info box */
+        .order-box {
+            background-color: #f8f9fa;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        .order-number {
+            font-size: 20px;
+            font-weight: bold;
+            color: #003F91;
+            margin-bottom: 15px;
+        }
+        .order-detail {
+            font-size: 14px;
+            color: #333333;
+            margin: 8px 0;
+            line-height: 1.4;
+        }
+        .order-label {
+            font-weight: 600;
+            color: #666666;
+        }
+        /* Products table */
+        .products-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+        }
+        .products-table th {
+            background-color: #003F91;
+            color: #ffffff;
+            padding: 14px 12px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .products-table td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #E5E7EB;
+            font-size: 14px;
+            color: #333333;
+            vertical-align: middle;
+        }
+        .products-table tr:last-child td {
+            border-bottom: none;
+        }
+        .products-table tr:hover {
+            background-color: #fafafa;
+        }
+        .product-name {
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+        .product-quantity {
+            text-align: center;
+            color: #666666;
+        }
+        .product-price {
+            text-align: right;
+            font-weight: 600;
+        }
+        /* Totals */
+        .totals-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+        }
+        .totals-table td {
+            padding: 12px 0;
+            font-size: 15px;
+            color: #333333;
+        }
+        .totals-table .label {
+            color: #666666;
+        }
+        .totals-table .value {
+            text-align: right;
+            font-weight: 500;
+        }
+        .totals-table .total-separator {
+            border-top: 2px solid #003F91;
+            height: 1px;
+        }
+        .totals-table .total-row {
+            font-weight: bold;
+            font-size: 22px;
+            color: #003F91;
+        }
+        .total-row td {
+            padding-top: 15px !important;
+        }
+        /* CTA Button */
+        .cta-button {
+            display: inline-block;
+            background-color: #1E5EFF;
+            color: #ffffff !important;
+            text-decoration: none;
+            padding: 16px 36px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 25px 0;
+            transition: background-color 0.3s ease;
+        }
+        .cta-button:hover {
+            background-color: #0045cc !important;
+        }
+        /* Trust section */
+        .trust-section {
+            background-color: #f8f9fa;
+            padding: 22px;
+            margin-top: 25px;
+            border-radius: 10px;
+            border-left: 4px solid #1E5EFF;
+        }
+        .trust-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #003F91;
+            margin-bottom: 12px;
+        }
+        .trust-item {
+            font-size: 13px;
+            color: #666666;
+            margin: 6px 0;
+            line-height: 1.4;
+        }
+        /* Footer */
+        .email-footer {
+            background-color: #1a1a1a;
+            padding: 25px 20px;
+            text-align: center;
+        }
+        .footer-text {
+            font-size: 12px;
+            color: #999999;
+            margin: 5px 0;
+        }
+        .footer-link {
+            color: #00A8B5;
+            text-decoration: none;
+        }
+        .social-links {
+            margin-top: 15px;
+        }
+        .social-link {
+            display: inline-block;
+            margin: 0 8px;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 13px;
+        }
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .email-wrapper {
+                background-color: #1a1a1a;
+            }
+            .email-container {
+                background-color: #2d2d2d;
+            }
+            .email-header {
+                background: linear-gradient(135deg, #003F91 0%, #0056b3 100%);
+            }
+            .logo-container {
+                background-color: #ffffff;
+            }
+            .title {
+                color: #ffffff;
+            }
+            .subtitle {
+                color: #aaaaaa;
+            }
+            .order-box {
+                background-color: #3a3a3a;
+                border-color: #4a4a4a;
+            }
+            .order-detail {
+                color: #dddddd;
+            }
+            .order-label {
+                color: #aaaaaa;
+            }
+            .products-table th {
+                background-color: #004ba0;
+            }
+            .products-table td {
+                border-color: #4a4a4a;
+                color: #dddddd;
+            }
+            .product-name {
+                color: #ffffff;
+            }
+            .totals-table td {
+                color: #dddddd;
+            }
+            .totals-table .label {
+                color: #aaaaaa;
+            }
+            .trust-section {
+                background-color: #3a3a3a;
+            }
+            .trust-title {
+                color: #00A8B5;
+            }
+            .trust-item {
+                color: #aaaaaa;
+            }
+            .email-footer {
+                background-color: #0d0d0d;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        <div class="email-container">
+            <!-- Header -->
+            <div class="email-header">
+                <div class="logo-container" style="background: transparent; box-shadow: none;">
+                    <span class="logo-text" style="font-size: 28px; color: #ffffff; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">TROPICOLORS</span>
+                </div>
+            </div>
+            
+            <!-- Content -->
+            <div class="email-content">
+                <h1 class="title">¡Gracias por tu compra!</h1>
+                <p class="subtitle">Tu pedido ha sido confirmado y estamos preparándolo con mucho cuidado.</p>
+                
+                <!-- Order Info -->
+                <div class="order-box">
+                    <div class="order-number">Pedido #{{order_number}}</div>
+                    <div class="order-detail">
+                        <span class="order-label">Fecha:</span> {{order_date}}
+                    </div>
+                    <div class="order-detail">
+                        <span class="order-label">Método de pago:</span> {{payment_method}}
+                    </div>
+                    <div class="order-detail">
+                        <span class="order-label">Estado:</span> <span style="color: #28a745; font-weight: bold;">Confirmado</span>
+                    </div>
+                </div>
+                
+                <!-- Shipping Info -->
+                <h3 style="color: #003F91; font-size: 16px; margin: 25px 0 12px 0; font-weight: 600;">Información de envío</h3>
+                <div class="order-box">
+                    <div class="order-detail">
+                        <span class="order-label">Destinatario:</span> {{customer_name}}
+                    </div>
+                    <div class="order-detail">
+                        <span class="order-label">Teléfono:</span> {{customer_phone}}
+                    </div>
+                    <div class="order-detail">
+                        <span class="order-label">RFC:</span> {{customer_rfc}}
+                    </div>
+                    <div class="order-detail">
+                        <span class="order-label">Dirección:</span> {{shipping_address}}
+                    </div>
+                    <div class="order-detail">
+                        <span class="order-label">Ciudad:</span> {{shipping_city}}
+                    </div>
+                    <p style="font-size: 12px; color: #dc3545; margin-top: 12px; line-height: 1.4;">
+                        ⚠️ Revisa que estos datos sean correctos. Si necesitas hacer un cambio, contáctanos de inmediato.
+                    </p>
+                </div>
+                
+                <!-- Products -->
+                <h3 style="color: #003F91; font-size: 16px; margin: 25px 0 12px 0; font-weight: 600;">Resumen del pedido</h3>
+                <table class="products-table">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th style="text-align: center;">Cant.</th>
+                            <th style="text-align: right;">Precio</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{products_rows}}
+                    </tbody>
+                </table>
+                
+                <!-- Totals -->
+                <table class="totals-table">
+                    <tr>
+                        <td class="label">Subtotal</td>
+                        <td class="value">{{subtotal}}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Envío</td>
+                        <td class="value">{{shipping_cost}}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Impuestos</td>
+                        <td class="value">{{tax}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="total-separator"></td>
+                    </tr>
+                    <tr class="total-row">
+                        <td>Total</td>
+                        <td class="value">{{total}}</td>
+                    </tr>
+                </table>
+                
+                <!-- CTA Button -->
+                <div style="text-align: center;">
+                    <a href="{{order_url}}" class="cta-button">Ver mi pedido</a>
+                </div>
+                
+                <!-- Trust Section -->
+                <div class="trust-section">
+                    <div class="trust-title">🔒 Tu compra está protegida</div>
+                    <div class="trust-item">• Política de devoluciones: 7 días para cambios y devoluciones</div>
+                    <div class="trust-item">• WhatsApp: +52 55 5114 6856</div>
+                    <div class="trust-item">• Correo: tropicolors20@outlook.es</div>
+                    <div class="trust-item">• Notificación: Te avisaremos cuando tu pedido sea enviado</div>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="email-footer">
+                <p class="footer-text" style="font-size: 14px; color: #ffffff; font-weight: 600;">Tropicolors</p>
+                <p class="footer-text">Colorantes Artificiales de Alta Concentración</p>
+                <p class="footer-text">
+                    <a href="https://tropicolors.mx" class="footer-link">tropicolors.mx</a>
+                </p>
+                <p class="footer-text" style="margin-top: 15px;">
+                    © 2024 Tropicolors. Todos los derechos reservados.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
