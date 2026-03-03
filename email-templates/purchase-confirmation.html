@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="x-apple-disable-message-reformatting">
+    <title>Confirmación de tu pedido - Tropicolors</title>
+    
+    <!-- Preheader text (shows in email preview) -->
+    <meta name="description" content="¡Gracias por tu compra! Estamos preparando tu pedido con mucho cuidado.">
+    
+    <!-- Google Fonts - Using system fonts as fallback for better email compatibility -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    </noscript>
+    <![endif]-->
+
+    <style>
+        /* Core Reset - Essential for email consistency */
+        body, table, td, p, a, h1, h2, h3, h4, h5, h6 {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            width: 100% !important;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            line-height: 1.5;
+        }
+
+        /* Table reset */
+        table {
+            border-spacing: 0 !important;
+            border-collapse: collapse !important;
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+
+        table, td {
+            border-spacing: 0;
+        }
+
+        /* Image handling */
+        img {
+            -ms-interpolation-mode: bicubic;
+            border: 0;
+            height: auto;
+            line-height: 100%;
+            outline: none;
+            text-decoration: none;
+        }
+
+        /* Link styles */
+        a {
+            text-decoration: none;
+        }
+
+        /* Mobile-first responsive styles */
+        @media screen and (max-width: 600px) {
+            .container { 
+                width: 100% !important; 
+                max-width: 100% !important;
+            }
+            .mobile-padding { 
+                padding: 20px !important; 
+            }
+            .mobile-stack { 
+                display: block !important; 
+                width: 100% !important; 
+                padding-right: 0 !important;
+                padding-bottom: 15px !important;
+            }
+            .mobile-center { 
+                text-align: center !important; 
+            }
+            .mobile-text-left {
+                text-align: left !important;
+            }
+            .hide-mobile { 
+                display: none !important; 
+            }
+            .product-image-col {
+                width: 70px !important;
+                padding-right: 12px !important;
+            }
+            .product-image {
+                width: 60px !important;
+                height: 60px !important;
+            }
+            .header-content {
+                padding: 30px 20px !important;
+            }
+            .section-padding {
+                padding: 20px !important;
+            }
+            .cta-button {
+                display: block !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+                padding: 16px 24px !important;
+            }
+            .footer-content {
+                padding: 25px 20px !important;
+            }
+        }
+
+        /* Dark Mode Support - Applied via media query */
+        @media (prefers-color-scheme: dark) {
+            .dark-mode-bg { 
+                background-color: #1a1a2e !important; 
+            }
+            .dark-mode-text { 
+                color: #ffffff !important; 
+            }
+            .dark-mode-text-secondary { 
+                color: #a0a0b0 !important; 
+            }
+            .dark-mode-card { 
+                background-color: #16213e !important; 
+            }
+            .dark-mode-border { 
+                border-color: #2a2a4a !important; 
+            }
+            .dark-mode-input { 
+                background-color: #1e1e3f !important; 
+                color: #ffffff !important;
+            }
+        }
+
+        /* Outlook-specific fixes */
+        /* [if mso]> styles would go here but we use conditional comments above */
+        
+        /* Button hover states */
+        .cta-button:hover {
+            background-color: #0045cc !important;
+        }
+        
+        .cta-secondary:hover {
+            background-color: #f0fdfa !important;
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f6f8; color: #1a1a1a;">
+
+    <!-- Preheader (hidden text for email clients) -->
+    <div style="display: none; font-size: 1px; color: #fefefe; line-height: 1px; max-height: 0; max-width: 0; opacity: 0; overflow: hidden;">
+        ¡Gracias por tu compra! Estamos preparando tu pedido con mucho cuidado. Número de pedido: {{order_number}}
+    </div>
+
+    <!-- Main Wrapper -->
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f6f8;">
+        <tr>
+            <td align="center" style="padding: 30px 10px;">
+                
+                <!-- Email Container - Max 600px -->
+                <table role="presentation" cellpadding="0" cellspacing="0" width="600" class="container" style="background-color: #ffffff; max-width: 600px; width: 100%; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+
+                    <!-- HEADER - Brand Color Background -->
+                    <tr>
+                        <td class="header-content dark-mode-bg" style="background: linear-gradient(135deg, #003F91 0%, #0056b3 100%); padding: 40px 30px; text-align: center;">
+                            <!-- Logo -->
+                            <img src="https://i.imgur.com/tropicolors-logo.png" alt="Tropicolors" width="150" style="display: block; margin: 0 auto 20px; max-width: 150px; height: auto;">
+                            
+                            <!-- Success Icon -->
+                            <div style="width: 64px; height: 64px; background-color: #00A8B5; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
+                                <img src="https://cdn-icons-png.flaticon.com/512/7518/7518748.png" alt="✓" width="32" style="display: block;">
+                            </div>
+
+                            <!-- Title -->
+                            <h1 style="color: #ffffff; font-size: 28px; font-weight: 700; margin: 0 0 12px; line-height: 1.3;">
+                                ¡Gracias por tu compra!
+                            </h1>
+
+                            <!-- Subtitle -->
+                            <p style="color: rgba(255,255,255,0.9); font-size: 16px; margin: 0; font-weight: 400;">
+                                Estamos preparando tu pedido.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- ORDER CONFIRMATION SECTION -->
+                    <tr>
+                        <td class="section-padding" style="padding: 30px; background-color: #ffffff;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
+                                <tr>
+                                    <td style="padding: 25px;">
+                                        <!-- Order Number - Very Visible -->
+                                        <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                                            <tr>
+                                                <td style="padding-bottom: 20px;">
+                                                    <span style="color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Número de pedido</span>
+                                                    <p style="margin: 8px 0 0; color: #003F91; font-size: 24px; font-weight: 700;">#{{order_number}}</p>
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                        <!-- Order Details - Two Columns on Desktop -->
+                                        <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                                            <tr>
+                                                <!-- Date -->
+                                                <td class="mobile-stack" style="padding-right: 20px; vertical-align: top; width: 50%;">
+                                                    <span style="color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Fecha de compra</span>
+                                                    <p style="margin: 5px 0 0; color: #1e293b; font-size: 14px; font-weight: 500;">{{order_date}}</p>
+                                                </td>
+                                                <!-- Payment Method -->
+                                                <td class="mobile-stack" style="vertical-align: top; width: 50%;">
+                                                    <span style="color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Método de pago</span>
+                                                    <p style="margin: 5px 0 0; color: #1e293b; font-size: 14px; font-weight: 500;">{{payment_method}}</p>
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                        <!-- Status Badge -->
+                                        <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                                            <tr>
+                                                <td style="padding-top: 20px;">
+                                                    <span style="display: inline-block; background-color: #dcfce7; color: #166534; padding: 10px 20px; border-radius: 25px; font-size: 13px; font-weight: 600;">
+                                                        ✓ Confirmado
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- SHIPPING INFO SECTION - Two Columns Desktop -->
+                    <tr>
+                        <td class="section-padding" style="padding: 0 30px 30px;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f0fdfa; border-radius: 12px; border: 1px solid #ccfbf1;">
+                                <tr>
+                                    <td style="padding: 25px;">
+                                        <!-- Section Header with Icon -->
+                                        <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                                            <tr>
+                                                <td style="padding-bottom: 20px;">
+                                                    <span style="color: #00A8B5; font-size: 14px; font-weight: 600;">
+                                                        📦 Información de envío
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                        <!-- Two Column Layout -->
+                                        <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                                            <tr>
+                                                <!-- Column 1 - Recipient & Address -->
+                                                <td class="mobile-stack" style="padding-right: 15px; vertical-align: top; width: 50%;">
+                                                    <p style="margin: 0 0 8px; color: #1e293b; font-size: 14px; font-weight: 600;">
+                                                        👤 {{customer_name}}
+                                                    </p>
+                                                    <p style="margin: 0 0 15px; color: #475569; font-size: 13px; line-height: 1.5;">
+                                                        📍 {{shipping_address}}
+                                                    </p>
+                                                </td>
+                                                <!-- Column 2 - City, State, Phone -->
+                                                <td class="mobile-stack" style="vertical-align: top; width: 50%;">
+                                                    <p style="margin: 0 0 8px; color: #475569; font-size: 13px;">
+                                                        🏙️ {{shipping_city}}, {{shipping_state}} {{shipping_postal_code}}
+                                                    </p>
+                                                    <p style="margin: 0 0 15px; color: #475569; font-size: 13px;">
+                                                        🌎 {{shipping_country}}
+                                                    </p>
+                                                    {{#if customer_phone}}
+                                                    <p style="margin: 0; color: #475569; font-size: 13px;">
+                                                        📱 {{customer_phone}}
+                                                    </p>
+                                                    {{/if}}
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                        <!-- Microcopy - Check info -->
+                                        <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                                            <tr>
+                                                <td style="padding-top: 20px; border-top: 1px solid #ccfbf1;">
+                                                    <p style="margin: 0; color: #64748b; font-size: 12px; font-style: italic;">
+                                                        ⚠️ Revisa que estos datos sean correctos. Si necesitas hacer un cambio, contáctanos de inmediato.
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- PRODUCT SUMMARY -->
+                    <tr>
+                        <td class="section-padding" style="padding: 0 30px 30px;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td style="padding-bottom: 15px;">
+                                        <span style="color: #1e293b; font-size: 16px; font-weight: 600;">Productos pedidos</span>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Products Container -->
+                            <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
+                                <tr>
+                                    <td style="padding: 0;">
+                                        <!-- Dynamic Products Rows -->
+                                        {{products_html}}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- PAYMENT SUMMARY -->
+                    <tr>
+                        <td class="section-padding" style="padding: 0 30px 30px;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
+                                <tr>
+                                    <td style="padding: 25px;">
+                                        <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                                            <!-- Subtotal -->
+                                            <tr>
+                                                <td style="padding-bottom: 12px; color: #64748b; font-size: 14px;">Subtotal</td>
+                                                <td style="padding-bottom: 12px; text-align: right; color: #1e293b; font-size: 14px;">{{subtotal}}</td>
+                                            </tr>
+                                            <!-- Shipping -->
+                                            <tr>
+                                                <td style="padding-bottom: 12px; color: #64748b; font-size: 14px;">Envío</td>
+                                                <td style="padding-bottom: 12px; text-align: right; color: #1e293b; font-size: 14px;">{{shipping_cost}}</td>
+                                            </tr>
+                                            <!-- Tax -->
+                                            <tr>
+                                                <td style="padding-bottom: 15px; color: #64748b; font-size: 14px;">Impuestos (16%)</td>
+                                                <td style="padding-bottom: 15px; text-align: right; color: #1e293b; font-size: 14px;">{{tax}}</td>
+                                            </tr>
+                                            <!-- Total - Prominent -->
+                                            <tr>
+                                                <td style="border-top: 2px solid #003F91; padding-top: 15px;">
+                                                    <span style="color: #1e293b; font-size: 18px; font-weight: 700;">Total</span>
+                                                </td>
+                                                <td style="border-top: 2px solid #003F91; padding-top: 15px; text-align: right;">
+                                                    <span style="color: #003F91; font-size: 24px; font-weight: 700;">{{total}}</span>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- CTA BUTTONS -->
+                    <tr>
+                        <td class="section-padding" style="padding: 0 30px 30px; text-align: center;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td align="center" style="padding-bottom: 15px;">
+                                        <!-- Primary CTA -->
+                                        <a href="{{order_url}}" class="cta-button" style="display: inline-block; background-color: #003F91; color: #ffffff; padding: 16px 40px; border-radius: 10px; font-size: 16px; font-weight: 600; text-decoration: none; text-align: center; width: 100%; max-width: 280px; box-sizing: border-box;">
+                                            Ver mi pedido
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center">
+                                        <!-- Secondary CTA -->
+                                        <a href="{{shop_url}}" class="cta-button cta-secondary" style="display: inline-block; background-color: transparent; color: #00A8B5; padding: 14px 38px; border: 2px solid #00A8B5; border-radius: 10px; font-size: 15px; font-weight: 600; text-decoration: none; text-align: center; width: 100%; max-width: 280px; box-sizing: border-box;">
+                                            Seguir comprando
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- TRUST SECTION -->
+                    <tr>
+                        <td class="section-padding" style="padding: 0 30px 30px;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f0fdfa; border-radius: 12px; border: 1px solid #ccfbf1;">
+                                <tr>
+                                    <td style="padding: 25px; text-align: center;">
+                                        <!-- Main Trust Message -->
+                                        <p style="margin: 0 0 20px; color: #00A8B5; font-size: 15px; font-weight: 600;">
+                                            ✉️ Te notificaremos cuando tu pedido sea enviado.
+                                        </p>
+
+                                        <!-- Trust Items -->
+                                        <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                                            <tr>
+                                                <td style="padding: 10px 0; border-bottom: 1px solid #ccfbf1;">
+                                                    <p style="margin: 0; color: #475569; font-size: 13px;">
+                                                        <strong style="color: #1e293b;">🔄 Política de devoluciones:</strong> 30 días para devoluciones sin costo
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 10px 0; border-bottom: 1px solid #ccfbf1;">
+                                                    <p style="margin: 0; color: #475569; font-size: 13px;">
+                                                        <strong style="color: #1e293b;">💬 Soporte:</strong> WhatsApp +52 55 5114 6856
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 10px 0;">
+                                                    <p style="margin: 0; color: #475569; font-size: 13px;">
+                                                        <strong style="color: #1e293b;">📧 Email:</strong> tropicolors@hotmail.com
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- FOOTER -->
+                    <tr>
+                        <td class="footer-content" style="background-color: #1e293b; padding: 30px; text-align: center;">
+                            <!-- Social Icons -->
+                            <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 20px;">
+                                <tr>
+                                    <td align="center">
+                                        <a href="https://facebook.com/tropicolors" style="display: inline-block; margin: 0 8px; text-decoration: none;">
+                                            <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Facebook" width="28" style="display: block;">
+                                        </a>
+                                        <a href="https://wa.me/525551146856" style="display: inline-block; margin: 0 8px; text-decoration: none;">
+                                            <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp" width="28" style="display: block;">
+                                        </a>
+                                        <a href="https://instagram.com/tropicolors" style="display: inline-block; margin: 0 8px; text-decoration: none;">
+                                            <img src="https://cdn-icons-png.flaticon.com/512/3256/3256013.png" alt="Instagram" width="28" style="display: block;">
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Contact Info -->
+                            <p style="margin: 0 0 10px; color: rgba(255,255,255,0.7); font-size: 13px;">
+                                📱 +52 55 5114 6856 | ✉️ tropicolors@hotmail.com
+                            </p>
+                            <p style="margin: 0 0 15px; color: rgba(255,255,255,0.5); font-size: 12px;">
+                                Horario: Lun-Vie 9:00 - 18:00
+                            </p>
+
+                            <!-- Legal Notice -->
+                            <p style="margin: 0; color: rgba(255,255,255,0.4); font-size: 11px; max-width: 400px; margin: 0 auto; line-height: 1.5;">
+                                © {{current_year}} Tropicolors. Todos los derechos reservados.<br>
+                                Este correo fue enviado a {{customer_email}}<br>
+                                <a href="{{privacy_policy_url}}" style="color: rgba(255,255,255,0.6); text-decoration: underline;">Política de privacidad</a> | <a href="{{unsubscribe_url}}" style="color: rgba(255,255,255,0.6); text-decoration: underline;">Cancelar suscripción</a>
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+                <!-- End Container -->
+
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>

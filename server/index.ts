@@ -1,7 +1,17 @@
+import "dotenv/config";
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
+import { createCorsMiddleware, getAllowedOrigins } from "./cors";
+import { initEnv } from "./env";
+import { registerInvoiceRoutes } from "./routes.js";
+import path from "path";
+import { fileURLToPath } from "url";
+
+// ES Module __dirname equivalent
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const httpServer = createServer(app);
@@ -14,13 +24,21 @@ declare module "http" {
 
 app.use(
   express.json({
+    limit: "10mb", // Increase limit for PDF base64
     verify: (req, _res, buf) => {
       req.rawBody = buf;
     },
   }),
 );
 
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: false, limit: "10mb" }));
+
+// Serve attached_assets folder
+app.use("/attached_assets", express.static(path.join(__dirname, "..", "attached_assets")));
+
+// Apply secure CORS middleware
+const allowedOrigins = getAllowedOrigins();
+app.use(createCorsMiddleware(allowedOrigins));
 
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
@@ -60,7 +78,13 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Initialize and validate environment variables
+  initEnv();
+
   await registerRoutes(httpServer, app);
+  
+  // Register invoice routes
+  registerInvoiceRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
@@ -84,12 +108,11 @@ app.use((req, res, next) => {
   // Other ports are firewalled. Default to 5000 if not specified.
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
-  const port = parseInt(process.env.PORT || "5000", 10);
+  const port = parseInt(process.env.PORT || "3000", 10);
   httpServer.listen(
     {
       port,
-      host: "0.0.0.0",
-      reusePort: true,
+      host: "127.0.0.1"
     },
     () => {
       log(`serving on port ${port}`);
