@@ -3,7 +3,10 @@ import type { Order, OrderStatus, OrderLineItem } from '../shared/schema.js';
 
 // Firebase Firestore Storage Implementation
 export class FirebaseStorage {
-  private ordersCollection = db.collection('orders');
+  private get ordersCollection() {
+    if (!db) throw new Error('Firebase not initialized');
+    return db.collection('orders');
+  }
 
   async createOrder(orderData: {
     orderNumber: string;
