@@ -1,14 +1,11 @@
 {
   "buildCommand": "npx tsx script/build-vercel.ts",
-  "outputDirectory": "dist/public",
-  "framework": "vite",
+  "outputDirectory": "dist/client",
+  "framework": null,
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" }
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/attached_assets/(.*)", "destination": "/attached_assets/$1" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ],
-  "functions": {
-    "api/**/*.ts": {
-      "runtime": "@vercel/node@5.0.0",
-      "includeFiles": "{server,shared}/**"
-    }
-  }
+  "installCommand": "npm install"
 }
