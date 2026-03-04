@@ -3,31 +3,21 @@ import fs from "fs";
 import path from "path";
 
 export function serveStatic(app: Express) {
-  // Try multiple possible paths for Vercel
-  const possiblePaths = [
-    path.resolve(__dirname, "..", "dist/public"),
-    path.resolve(__dirname, "..", "..", "dist/public"),
-    path.resolve(process.cwd(), "dist/public"),
-  ];
-  
-  let distPath = "";
-  for (const p of possiblePaths) {
-    if (fs.existsSync(p)) {
-      distPath = p;
-      break;
-    }
-  }
-  
-  if (!distPath) {
-    // Use the first path as fallback for error message
-    distPath = possiblePaths[0];
-    console.error(`Could not find the build directory. Tried: ${possiblePaths.join(", ")}`);
-    // Don't throw, just log - let Vercel handle 404s
-    return;
+  // Vercel puts client build in dist/client
+  const distPath = path.resolve(__dirname, "../client");
+  if (!fs.existsSync(distPath)) {
+    throw new Error(
+      `Could not find the build directory: ${distPath}, make sure to build the client first`,
+    );
   }
 
-  console.log(`Serving static files from: ${distPath}`);
   app.use(express.static(distPath));
+
+  // Serve attached_assets folder
+  const assetsPath = path.resolve(__dirname, "../attached_assets");
+  if (fs.existsSync(assetsPath)) {
+    app.use("/attached_assets", express.static(assetsPath));
+  }
 
   // fall through to index.html if the file doesn't exist
   app.use("*", (_req, res) => {
