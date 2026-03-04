@@ -266,7 +266,7 @@ export async function sendInvoiceEmail(
  * Verifica la conexión con el servicio de email
  */
 export async function verifyEmailConnection(): Promise<boolean> {
-  const apiKey = process.env.BREVO_API_KEY;
+  const apiKey = process.env.BREVO_API_KEY || process.env['BREVO_API_KEY'];
   if (apiKey) {
     console.log("[Email] Brevo API configurada correctamente");
     return true;

@@ -16,7 +16,8 @@ export async function sendEmailViaBrevoAPI(
   textContent: string,
   attachment?: { content: string; filename: string; type: string }
 ): Promise<boolean> {
-  const apiKey = process.env.BREVO_API_KEY;
+  // Support both direct env access and Vercel's process.env
+  const apiKey = process.env.BREVO_API_KEY || (process as any).env?.BREVO_API_KEY;
   
   if (!apiKey) {
     console.error("BREVO_API_KEY no configurada");
@@ -66,6 +67,7 @@ export async function sendEmailViaBrevoAPI(
     } else {
       const error = await response.text();
       console.error("Error enviando correo vía Brevo API:", error);
+      console.error("Email payload:", JSON.stringify(emailPayload, null, 2));
       return false;
     }
   } catch (error) {
@@ -573,10 +575,13 @@ async function handlePaymentIntentSucceeded(
   paymentIntent: Stripe.PaymentIntent,
 ) {
   let order: Order | undefined;
+  
+  // Try to get order from Firebase first, then simple storage
   try {
-    order = await storage.getOrderByPaymentIntentId(paymentIntent.id);
+    order = await firebaseStorage.getOrderByPaymentIntentId(paymentIntent.id);
   } catch (error) {
-    console.error("No se pudo obtener la orden desde la base de datos:", error);
+    console.log("Firebase not available, trying simple storage:", error);
+    order = simpleStorage.getOrderByPaymentIntent(paymentIntent.id);
   }
 
   const receiptUrl = await fetchReceiptUrl(paymentIntent);
@@ -585,13 +590,17 @@ async function handlePaymentIntentSucceeded(
 
   if (order) {
     let updatedOrder = order;
+    
+    // Try to update in Firebase first, then simple storage
     try {
-      updatedOrder =
-        (await storage.updateOrderStatus(paymentIntent.id, "paid", {
-          receiptUrl: receiptUrl ?? order.receiptUrl,
-        })) ?? order;
+      updatedOrder = await firebaseStorage.updateOrderStatus(paymentIntent.id, "paid", {
+        receiptUrl: receiptUrl ?? order.receiptUrl,
+      }) ?? order;
     } catch (error) {
-      console.error("No se pudo actualizar el estado de la orden:", error);
+      console.log("Firebase not available, using simple storage:", error);
+      updatedOrder = simpleStorage.updateOrderStatus(paymentIntent.id, "paid", {
+        receiptUrl: receiptUrl ?? order.receiptUrl,
+      }) ?? order;
     }
 
     notificationPayload = buildNotificationPayloadFromOrder(updatedOrder);
@@ -620,17 +629,22 @@ async function handlePaymentIntentSucceeded(
 
 async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentIntent) {
   let order: Order | undefined;
+  
+  // Try to get order from Firebase first, then simple storage
   try {
-    order = await storage.getOrderByPaymentIntentId(paymentIntent.id);
+    order = await firebaseStorage.getOrderByPaymentIntentId(paymentIntent.id);
   } catch (error) {
-    console.error("No se pudo obtener la orden fallida:", error);
+    console.log("Firebase not available, trying simple storage:", error);
+    order = simpleStorage.getOrderByPaymentIntent(paymentIntent.id);
   }
 
   if (order) {
+    // Try to update in Firebase first, then simple storage
     try {
-      await storage.updateOrderStatus(paymentIntent.id, "failed");
+      await firebaseStorage.updateOrderStatus(paymentIntent.id, "failed");
     } catch (error) {
-      console.error("No se pudo marcar la orden como fallida:", error);
+      console.log("Firebase not available, using simple storage:", error);
+      simpleStorage.updateOrderStatus(paymentIntent.id, "failed");
     }
     await sendOrderEmails(order, "failed");
     return;

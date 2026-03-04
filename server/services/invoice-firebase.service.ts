@@ -19,8 +19,15 @@ import { sendInvoiceEmail } from "./email.service.js";
 /**
  * Referencia a la colección de facturas en Firestore
  */
-const invoicesCollection = db.collection("invoices");
-const conceptsCollection = db.collection("invoice_concepts");
+function getInvoicesCollection() {
+  if (!db) throw new Error('Firebase not initialized. Please check your FIREBASE configuration.');
+  return db.collection("invoices");
+}
+
+function getConceptsCollection() {
+  if (!db) throw new Error('Firebase not initialized. Please check your FIREBASE configuration.');
+  return db.collection("invoice_concepts");
+}
 
 /**
  * Datos del emisor predefinidos
@@ -43,6 +50,7 @@ const INVOICE_PREFIX = "TCO-";
  */
 async function getNextInvoiceNumber(): Promise<string> {
   try {
+    const invoicesCollection = getInvoicesCollection();
     // Buscar la última factura ordenando por createdAt
     const snapshot = await invoicesCollection
       .orderBy("createdAt", "desc")
@@ -243,6 +251,7 @@ export async function createInvoice(data: InvoiceInputData): Promise<{
     };
 
     // Guardar factura en Firestore
+    const invoicesCollection = getInvoicesCollection();
     const invoiceRef = invoicesCollection.doc(invoiceId);
     await invoiceRef.set({
       id: invoiceId,
@@ -269,6 +278,7 @@ export async function createInvoice(data: InvoiceInputData): Promise<{
         createdAt: now,
       };
 
+      const conceptsCollection = getConceptsCollection();
       const conceptRef = conceptsCollection.doc(conceptId);
       await conceptRef.set(conceptData);
       concepts.push(conceptData);
@@ -340,11 +350,12 @@ export async function createInvoice(data: InvoiceInputData): Promise<{
  */
 export async function getInvoices(): Promise<Invoice[]> {
   try {
+    const invoicesCollection = getInvoicesCollection();
     const snapshot = await invoicesCollection
       .orderBy("createdAt", "desc")
       .get();
 
-    return snapshot.docs.map(doc => doc.data() as Invoice);
+    return snapshot.docs.map((doc: any) => doc.data() as Invoice);
   } catch (error) {
     console.error("[Invoice] Error al obtener facturas:", error);
     return [];
@@ -356,6 +367,7 @@ export async function getInvoices(): Promise<Invoice[]> {
  */
 export async function getInvoiceById(id: string): Promise<Invoice | null> {
   try {
+    const invoicesCollection = getInvoicesCollection();
     const doc = await invoicesCollection.doc(id).get();
 
     if (!doc.exists) {
@@ -374,11 +386,12 @@ export async function getInvoiceById(id: string): Promise<Invoice | null> {
  */
 export async function getInvoiceConcepts(invoiceId: string): Promise<InvoiceConcept[]> {
   try {
+    const conceptsCollection = getConceptsCollection();
     const snapshot = await conceptsCollection
       .where("invoiceId", "==", invoiceId)
       .get();
 
-    return snapshot.docs.map(doc => doc.data() as InvoiceConcept);
+    return snapshot.docs.map((doc: any) => doc.data() as InvoiceConcept);
   } catch (error) {
     console.error("[Invoice] Error al obtener conceptos:", error);
     return [];
@@ -421,6 +434,7 @@ export async function sendInvoice(id: string): Promise<{
 
     if (result.success) {
       // Actualizar status en Firestore
+      const invoicesCollection = getInvoicesCollection();
       await invoicesCollection.doc(id).update({
         status: "enviada",
         sentAt: new Date(),
