@@ -472,7 +472,7 @@ function OrdersPage({ orders, setOrders }: { orders: Order[]; setOrders: (orders
   const confirmStatusChange = async () => {
     if (!selectedOrder) return;
     try {
-      const response = await fetch("/api/orders/status", {
+      const response = await fetch("/api/update-order-status", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
