@@ -8,7 +8,7 @@ import { simpleStorage } from "./storage-simple.js";
 import { firebaseStorage } from "./storage-firebase.js";
 import type { Order, OrderLineItem, OrderStatus } from "@shared/schema";
 
-// Función para enviar correo usando la API de Brevo
+// Función para enviar correo usando nodemailer con SMTP
 export async function sendEmailViaBrevoAPI(
   to: string,
   subject: string,
@@ -16,65 +16,62 @@ export async function sendEmailViaBrevoAPI(
   textContent: string,
   attachment?: { content: string; filename: string; type: string }
 ): Promise<boolean> {
-  // Support both direct env access and Vercel's process.env
-  const apiKey = process.env.BREVO_API_KEY || (process as any).env?.BREVO_API_KEY;
+  // Usar nodemailer con SMTP
   
-  if (!apiKey) {
-    console.error("BREVO_API_KEY no configurada");
+  // Configuración SMTP del .env
+  const smtpHost = process.env.EMAIL_SMTP_HOST || 'smtp-relay.brevo.com';
+  const smtpPort = parseInt(process.env.EMAIL_SMTP_PORT || '587');
+  const smtpUser = process.env.EMAIL_SMTP_USER;
+  const smtpPass = process.env.EMAIL_SMTP_PASS;
+  const fromEmail = process.env.EMAIL_FROM || 'noreply@tropicolors.mx';
+  const fromName = 'TropicColors';
+  
+  if (!smtpUser || !smtpPass) {
+    console.error("[Email] Credenciales SMTP no configuradas en .env");
     return false;
   }
-
-  // Log first few chars of API key for debugging
-  console.log("[Email] Using Brevo API key:", apiKey.substring(0, 10) + "...");
+  
+  console.log("[Email] Configurando transporte SMTP:", smtpHost, ":" + smtpPort);
+  console.log("[Email] Enviando a:", to);
 
   try {
-    // Build the email payload
-    const emailPayload: any = {
-      sender: {
-        name: "Tropicolors",
-        email: "tropicolors20@outlook.es",
+    // Crear transporter de nodemailer
+    const transporter = nodemailer.createTransport({
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpPort === 465,
+      auth: {
+        user: smtpUser,
+        pass: smtpPass,
       },
-      to: [
-        {
-          email: to,
-        }
-      ],
-      subject: subject,
-      htmlContent: htmlContent,
-      textContent: textContent,
-    };
-    
-    // Add attachment if provided
-    if (attachment) {
-      emailPayload.attachment = [
-        {
-          content: attachment.content,
-          name: attachment.filename,
-        }
-      ];
-    }
-    
-    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Api-Key": apiKey,
-      },
-      body: JSON.stringify(emailPayload),
     });
 
-    if (response.ok) {
-      const result = await response.json();
-      console.log("Correo enviado vía Brevo API, messageId:", result.messageId);
-      return true;
-    } else {
-      const error = await response.text();
-      console.error("Error enviando correo vía Brevo API:", error);
-      console.error("Email payload:", JSON.stringify(emailPayload, null, 2));
-      return false;
+    // Opciones del email
+    const mailOptions: any = {
+      from: `"${fromName}" <${fromEmail}>`,
+      to: to,
+      subject: subject,
+      text: textContent,
+      html: htmlContent,
+    };
+
+    // Agregar adjunto si existe
+    if (attachment) {
+      mailOptions.attachments = [
+        {
+          filename: attachment.filename,
+          content: Buffer.from(attachment.content, 'base64'),
+          contentType: attachment.type,
+        },
+      ];
     }
+
+    // Enviar el email
+    const info = await transporter.sendMail(mailOptions);
+    console.log("[Email] Email enviado exitosamente, messageId:", info.messageId);
+    return true;
   } catch (error) {
-    console.error("Excepción enviando correo vía Brevo API:", error);
+    console.error("[Email] Error enviando correo vía SMTP:", error);
     return false;
   }
 }
