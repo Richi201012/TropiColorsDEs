@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -596,7 +596,7 @@ function OrdersPage({ orders, setOrders }: { orders: Order[]; setOrders: (orders
                 </TableRow>
               ) : (
                 filteredOrders.map((order) => (
-                  <>
+                  <React.Fragment key={order.id}>
                     <TableRow 
                       key={order.id} 
                       className={`cursor-pointer hover:bg-gray-50 ${expandedRows.has(order.id) ? 'bg-gray-50' : ''}`}
@@ -656,7 +656,7 @@ function OrdersPage({ orders, setOrders }: { orders: Order[]; setOrders: (orders
                                 </TableHeader>
                                 <TableBody>
                                   {order.items.map((item, idx) => (
-                                    <TableRow key={idx}>
+                                    <TableRow key={`${order.id}-item-${idx}`}>
                                       <TableCell className="font-medium">{item.name}</TableCell>
                                       <TableCell className="text-center">{item.quantity}</TableCell>
                                       <TableCell className="text-right">{formatCurrency(item.price)}</TableCell>
@@ -670,7 +670,7 @@ function OrdersPage({ orders, setOrders }: { orders: Order[]; setOrders: (orders
                         </TableCell>
                       </TableRow>
                     )}
-                  </>
+                  </React.Fragment>
                 ))
               )}
             </TableBody>

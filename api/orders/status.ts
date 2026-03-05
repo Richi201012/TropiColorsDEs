@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { firebaseStorage } from "../server/storage-firebase.js";
 import { simpleStorage } from "../server/storage-simple.js";
+import { sendEmailViaBrevoAPI, generateOrderStatusEmailHTML } from "../server/payments.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Set CORS headers
@@ -47,6 +48,63 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (!updatedOrder) {
       return res.status(404).json({ success: false, message: "Order not found" });
+    }
+
+    // Send email notification for status change
+    try {
+      const htmlContent = generateOrderStatusEmailHTML({
+        orderNumber: updatedOrder.orderNumber,
+        customerName: updatedOrder.customerName,
+        customerEmail: updatedOrder.customerEmail,
+        status: status,
+        trackingNumber: status === "sent" ? trackingNumber : undefined,
+        shippingCompany: status === "sent" ? shippingCompany : undefined,
+        shippingAddress: updatedOrder.shippingAddress 
+          ? `${updatedOrder.shippingAddress}, ${updatedOrder.shippingCity || ''}, ${updatedOrder.shippingState || ''} ${updatedOrder.shippingPostalCode || ''}, ${updatedOrder.shippingCountry || ''}`
+          : undefined,
+      });
+
+      const subjects: Record<string, string> = {
+        pending: `Tu pedido ${updatedOrder.orderNumber} está siendo procesado - Tropicolors`,
+        paid: `¡Tu pago ha sido confirmado! - Pedido ${updatedOrder.orderNumber} - Tropicolors`,
+        sent: `Tu pedido ${updatedOrder.orderNumber} ha sido enviado - Tropicolors`,
+        delivered: `Tu pedido ${updatedOrder.orderNumber} ha sido entregado - Tropicolors`,
+        failed: `Problema con tu pago - Pedido ${updatedOrder.orderNumber} - Tropicolors`,
+      };
+
+      let textContent = "";
+      switch (status) {
+        case "pending":
+          textContent = `Tu pedido ${updatedOrder.orderNumber} está siendo procesado. Te notificaremos cuando tu pago sea confirmado.`;
+          break;
+        case "paid":
+          textContent = `¡Tu pago ha sido confirmado! Tu pedido ${updatedOrder.orderNumber} está siendo preparado para su envío.`;
+          break;
+        case "sent":
+          textContent = `Tu pedido ${updatedOrder.orderNumber} ha sido enviado. ${trackingNumber ? 'Número de rastreo: ' + trackingNumber + ' - Paquetería: ' + shippingCompany : ''}`;
+          break;
+        case "delivered":
+          textContent = `Tu pedido ${updatedOrder.orderNumber} ha sido entregado. ¡Gracias por tu compra en Tropicolors!`;
+          break;
+        case "failed":
+          textContent = `El pago de tu pedido ${updatedOrder.orderNumber} no pudo ser procesado. Por favor contacta al soporte.`;
+          break;
+        default:
+          textContent = `Tu pedido ${updatedOrder.orderNumber} ha sido actualizado.`;
+      }
+
+      if (htmlContent) {
+        await sendEmailViaBrevoAPI(
+          updatedOrder.customerEmail,
+          subjects[status] || `Actualización de tu pedido ${updatedOrder.orderNumber} - Tropicolors`,
+          htmlContent,
+          textContent
+        );
+        console.log("[Status API] Email notification sent to:", updatedOrder.customerEmail);
+      }
+    } catch (emailError) {
+      console.error("[Status API] Error sending email:", emailError);
+      // Don't fail the request if email fails
     }
 
     return res.json({ success: true, order: updatedOrder });
