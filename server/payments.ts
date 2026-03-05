@@ -20,12 +20,14 @@ export async function sendEmailViaBrevoAPI(
   const apiKey = process.env.BREVO_API_KEY || (process as any).env?.BREVO_API_KEY;
   
   if (!apiKey) {
-    console.error("BREVO_API_KEY no configurada");
+    console.error("[Email] BREVO_API_KEY no configurada - no se puede enviar email");
+    console.error("[Email] Variables de entorno disponibles:", Object.keys(process.env).filter(k => k.includes('BREVO') || k.includes('EMAIL')));
     return false;
   }
 
   // Log first few chars of API key for debugging
   console.log("[Email] Using Brevo API key:", apiKey.substring(0, 10) + "...");
+  console.log("[Email] Enviando a:", to);
 
   try {
     // Build the email payload

@@ -52,6 +52,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Send email notification for status change
     try {
+      console.log("[Status API] Starting email notification for order:", updatedOrder.orderNumber, "to:", updatedOrder.customerEmail);
+      
       const htmlContent = generateOrderStatusEmailHTML({
         orderNumber: updatedOrder.orderNumber,
         customerName: updatedOrder.customerName,
