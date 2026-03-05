@@ -24,6 +24,9 @@ export async function sendEmailViaBrevoAPI(
     return false;
   }
 
+  // Log first few chars of API key for debugging
+  console.log("[Email] Using Brevo API key:", apiKey.substring(0, 10) + "...");
+
   try {
     // Build the email payload
     const emailPayload: any = {
