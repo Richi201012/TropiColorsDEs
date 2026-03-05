@@ -285,18 +285,15 @@ export async function createInvoice(data: InvoiceInputData): Promise<{
     }
 
     // ============================================
-    // GENERAR PDF
+    // GENERAR PDF (solo en memoria para email)
     // ============================================
 
     const invoice: Invoice = { id: invoiceId, ...invoiceData };
 
-    try {
-      const pdfPath = await generateInvoicePDF(invoice, concepts);
-      console.log(`[Invoice] PDF generado: ${pdfPath}`);
-    } catch (pdfError) {
-      console.error("[Invoice] Error al generar PDF:", pdfError);
-      // Continuar sin PDF si falla
-    }
+    // NOTA: En Vercel el sistema de archivos es de solo lectura,
+    // por lo que no guardamos el PDF localmente.
+    // El PDF se genera en memoria para adjuntarlo al email.
+    console.log(`[Invoice] PDF se generará en memoria para email`);
 
     // ============================================
     // ENVIAR EMAIL SI SE SOLICITA

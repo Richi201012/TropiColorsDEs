@@ -324,10 +324,10 @@ export default function InvoicesPage() {
       
       const result = await response.json();
       
-      if (result.success) {
+      if (result.success && result.invoice) {
         setFeedback({
           type: "success",
-          message: `Factura ${result.data.invoiceNumber} creada correctamente`,
+          message: `Factura ${result.invoice.invoiceNumber} creada correctamente`,
         });
         setIsCreateModalOpen(false);
         resetForm();
