@@ -316,7 +316,7 @@ export default function InvoicesPage() {
         sendEmail: formData.sendEmail,
       };
 
-      const response = await fetch("/api/invoices", {
+      const response = await fetch("/api/create-invoice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(apiData),
@@ -361,8 +361,10 @@ export default function InvoicesPage() {
   // Enviar factura
   const handleSendInvoice = async (invoice: Invoice) => {
     try {
-      const response = await fetch(`/api/invoices/${invoice.id}/send`, {
+      const response = await fetch("/api/send-invoice", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: invoice.id }),
       });
       
       const result = await response.json();
