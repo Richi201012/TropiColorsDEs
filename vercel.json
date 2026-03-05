@@ -7,5 +7,11 @@
     { "source": "/attached_assets/(.*)", "destination": "/attached_assets/$1" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
+  "functions": {
+    "api/**/*.ts": {
+      "runtime": "@vercel/node@5.0.0",
+      "includeFiles": "{server,shared}/**"
+    }
+  },
   "installCommand": "npm install"
 }
